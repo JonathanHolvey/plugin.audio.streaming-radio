@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sources>
+	<radio>
+		<stream bitrate="128">rtsp://stream.scahw.com.au/live/buddha_128.stream</stream>
+		<stream bitrate="32">rtsp://stream.scahw.com.au/live/buddha_32.stream</stream>
+		<name>Buddha Radio</name>
+		<tagline>Tune in, chill out</tagline>
+		<description>Chill Out Digital Radio - Buddha Radio has a very simple philosophy - to bring you the very best music that makes you feel good and feeds your soul.</description>
+		<fanart></fanart>
+		<thumbnail></thumbnail>
+		<scraper>
+			<url>http://www.buddharadio.com.au/</url>
+			<artist>
+				<xpath>div[id="Artist"]</xpath>
+				<regex>^ARTIST: (.+)$</regex>
+			</artist>
+			<title>
+				<xpath>div[id="Title"]</xpath>
+				<regex>^TITLE: (.+)$</regex>
+			</title>
+		</scraper>
+	</radio>
+</sources>
