@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.0.0">
+	<requires>
+		<import addon="xbmc.python" version="2.1.0"/>
+	</requires>
+	<extension library="addon.py" point="xbmc.python.pluginsource">
+		<provides>audio</provides>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="en_gb">Listen to custom radio streams with scraped metadata and artwork</summary>
+		<description lang="en_gb"/>
+		<disclaimer lang="en_gb"/>
+		<language/>
+		<platform>all</platform>
+		<license/>
+		<forum/>
+		<website/>
+		<email/>
+		<source/>
+	</extension>
+</addon>
