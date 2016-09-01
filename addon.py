@@ -6,9 +6,10 @@ import xbmcgui
 import xbmcaddon
 import xbmcplugin
 
-plugin = sys.argv[0]
+plugin_url = sys.argv[0]
 handle = int(sys.argv[1])
-addon = xbmcaddon.Addon(id="plugin.audio.streaming-radio")
+addon = xbmcaddon.Addon()
+
 
 def create_list_item(source):
     li = xbmcgui.ListItem(source.find("name").text, iconImage="DefaultAudio.png")
@@ -29,18 +30,19 @@ def build_list():
     for source in sources.iter("radio"):
         li = create_list_item(source)
         li.setProperty("IsPlayable", "true")
-        url = "{}?stream={}".format(plugin, source.find("stream").text)
+        url = "{}?source={}".format(plugin_url, source.find("name").text)
         xbmcplugin.addDirectoryItem(handle=handle, url=url, listitem=li, isFolder=False)
 
     xbmcplugin.endOfDirectory(handle)
 
 
-def play_stream(url):
-    # Loop through sources XML to find entry with specified stream url
+def play_source(name):
+    # Loop through sources XML to find entry with specified name
     for source in sources.iter("radio"):
-        if url == source.find("stream").text:
+        if name == source.find("name").text:
             break
     li = create_list_item(source)
+    url = source.find("stream").text
     li.setPath(url)
     xbmcplugin.setResolvedUrl(handle, True, li)
 
@@ -48,7 +50,7 @@ def play_stream(url):
 sources = et.parse(os.path.join(addon.getAddonInfo("path"), "sources.xml"))
 params = urlparse.parse_qs(sys.argv[2][1:])
 
-if params.get("stream", None) is None:
+if params.get("source", None) is None:
     build_list()
 else:
-    play_stream(params["stream"][0])
+    play_source(params["source"][0])
