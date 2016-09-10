@@ -46,6 +46,8 @@ def play_source(name):
     li.setPath(url)
     xbmcplugin.setResolvedUrl(handle, True, li)
 
+    home.setProperty("streaming-radio.Title", "The Sound of Silence")
+    home.setProperty("streaming-radio.Artist", "Simon and Garfunkel")
 
 sources = et.parse(os.path.join(addon.getAddonInfo("path"), "sources.xml"))
 params = urlparse.parse_qs(sys.argv[2][1:])
@@ -53,4 +55,7 @@ params = urlparse.parse_qs(sys.argv[2][1:])
 if params.get("source", None) is None:
     build_list()
 else:
+    home = xbmcgui.Window(10000)
     play_source(params["source"][0])
+
+from lib import lightstreamer
