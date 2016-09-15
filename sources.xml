@@ -8,16 +8,5 @@
 		<description>Chill Out Digital Radio - Buddha Radio has a very simple philosophy - to bring you the very best music that makes you feel good and feeds your soul.</description>
 		<fanart>buddha-fanart.jpg</fanart>
 		<thumbnail>buddha-thumb.png</thumbnail>
-		<scraper>
-			<url>http://www.buddharadio.com.au/</url>
-			<artist>
-				<xpath>div[id="Artist"]</xpath>
-				<regex>^ARTIST: (.+)$</regex>
-			</artist>
-			<title>
-				<xpath>div[id="Title"]</xpath>
-				<regex>^TITLE: (.+)$</regex>
-			</title>
-		</scraper>
 	</radio>
 </sources>
