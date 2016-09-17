@@ -41,8 +41,14 @@ def play_source(name):
     for source in sources.iter("radio"):
         if name == source.find("name").text:
             break
+
+    # Find correct bitrate stream to play as per the maximum bitrate setting
+    max_bitrate = int(addon.getSetting("bitrate").split(" ")[0])
+    streams = dict((int(stream.get("bitrate", default=0)), stream.text) for stream in source.findall("stream"))
+    bitrates = [bitrate for bitrate in streams.keys() if bitrate <= max_bitrate]
+    url = streams[min(streams.keys())] if len(bitrates) == 0 else streams[max(bitrates)]
+
     li = create_list_item(source)
-    url = source.find("stream").text
     li.setPath(url)
     xbmcplugin.setResolvedUrl(handle, True, li)
 
