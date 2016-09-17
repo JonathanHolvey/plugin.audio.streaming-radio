@@ -5,6 +5,7 @@ import urlparse
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
+import xbmcvfs
 
 plugin_url = sys.argv[0]
 handle = int(sys.argv[1])
@@ -52,7 +53,13 @@ def play_source(name):
     li.setPath(url)
     xbmcplugin.setResolvedUrl(handle, True, li)
 
-sources = et.parse(os.path.join(addon.getAddonInfo("path"), "sources.xml"))
+
+# Create sources file in addon_data folder
+sources_path = os.path.join(addon.getAddonInfo("path"), "sources.xml")
+if not xbmcvfs.exists(sources_path):
+    xbmcvfs.copy(os.path.join(addon.getAddonInfo("path"), "resources", "sources.xml"), sources_path)
+
+sources = et.fromstring(xbmcvfs.File(sources_path).read())
 params = urlparse.parse_qs(sys.argv[2][1:])
 
 if params.get("source", None) is None:
