@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
 	<category>
-		<setting label="Maximum bitrate" type="labelenum" id="bitrate" values="128 kb/s|64 kb/s|32 kb/s"/>
+		<setting label="Maximum bitrate" type="labelenum" id="bitrate" values="128 kb/s|64 kb/s|32 kb/s" default="128 kb/s"/>
 	</category>
 </settings>
