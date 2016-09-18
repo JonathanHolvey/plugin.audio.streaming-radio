@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.1.0">
+<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.1.1">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 	</requires>
@@ -7,7 +7,7 @@
 		<provides>audio</provides>
 	</extension>
 	<extension point="xbmc.addon.metadata">
-		<summary lang="en_gb">Listen to custom radio streams with scraped metadata and artwork</summary>
+		<summary lang="en_gb">Listen to custom radio streams with station-specific artwork</summary>
 		<description lang="en_gb"/>
 		<disclaimer lang="en_gb"/>
 		<language/>
@@ -17,5 +17,15 @@
 		<website/>
 		<email/>
 		<source/>
+		<news>
+			v1.1.1 (2016-09-18)
+			- Bugfix: Added default value for maximum bitrate setting to prevent error if not set.
+
+			v1.1.0 (2016.09.17)
+			- Prevented users' customisations in sources.xml from being overwritten by updates.
+
+			v1.0.0 (2016-09-17)
+			- Initial release.
+		</news>
 	</extension>
 </addon>
