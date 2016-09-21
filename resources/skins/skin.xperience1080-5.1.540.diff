@@ -1,0 +1,56 @@
+diff --git a/1080i/DialogSeekBar.xml b/1080i/DialogSeekBar.xml
+index c8b627f..635d616 100644
+--- a/1080i/DialogSeekBar.xml
++++ b/1080i/DialogSeekBar.xml
+@@ -285,7 +285,7 @@
+                                 <posy>83</posy>
+                                 <width>1320</width>
+                                 <height>56</height>
+-                                <label>$INFO[MusicPlayer.PlaylistPosition,,. ]$INFO[MusicPlayer.Title]</label>
++                                <label>$VAR[NowPlayingTitle]</label>
+                                 <label2>$INFO[MusicPlayer.Rating,★ ,.0]</label2>
+                                 <disabledcolor>bbwhite</disabledcolor>
+                                 <font>Font-Condensed-S50-B</font>
+@@ -298,7 +298,7 @@
+                                 <posy>145</posy>
+                                 <width>1460</width>
+                                 <height>44</height>
+-                                <label>$INFO[MusicPlayer.Artist]$INFO[MusicPlayer.Album, • ,]$INFO[MusicPlayer.Year, • ,]</label>
++                                <label>$VAR[NowPlayingSubTitle]</label>
+                                 <textcolor>aawhite</textcolor>
+                                 <font>Font-Condensed-S36-B</font>
+                                 <align>left</align>
+@@ -733,4 +733,14 @@
+             </control>
+         </control>
+     </controls>
++    <includes>
++        <variable name="NowPlayingTitle">
++            <value condition="!IsEmpty(Window(10000).Property(streaming-radio.Title))">$INFO[Window(10000).Property(streaming-radio.Title)]</value>
++            <value>$INFO[MusicPlayer.PlaylistPosition,,. ]$INFO[MusicPlayer.Title]</value>
++        </variable>
++        <variable name="NowPlayingSubTitle">
++            <value condition="!IsEmpty(Window(10000).Property(streaming-radio.Artist))">$INFO[Window(10000).Property(streaming-radio.Artist)]</value>
++            <value>$INFO[MusicPlayer.Artist]$INFO[MusicPlayer.Album, • ,]$INFO[MusicPlayer.Year, • ,]</value>
++        </variable>
++    </includes>
+ </window>
+diff --git a/1080i/Includes_Info.xml b/1080i/Includes_Info.xml
+index 577b074..7078b90 100644
+--- a/1080i/Includes_Info.xml
++++ b/1080i/Includes_Info.xml
+@@ -205,12 +205,14 @@
+     <variable name="NowPlayingTitle">
+         <value condition="Player.HasVideo + !Pvr.IsPlayingTv">$INFO[VideoPlayer.Title]</value>
+         <value condition="Player.HasVideo + Pvr.IsPlayingTv">$INFO[VideoPlayer.ChannelName,,: ]$INFO[VideoPlayer.Title]</value>
++        <value condition="!IsEmpty(Window(10000).Property(streaming-radio.Title))">$INFO[Window(10000).Property(streaming-radio.Title)]</value>
+         <value>$INFO[MusicPlayer.Title]</value>
+     </variable>
+ 
+     <variable name="NowPlayingSubTitle">
+         <value condition="Player.HasVideo + !Pvr.IsPlayingTv">$INFO[Player.FinishTime,$LOCALIZE[31371] ,]</value>
+         <value condition="Player.HasVideo + Pvr.IsPlayingTv">$INFO[VideoPlayer.NextTitle,$LOCALIZE[19031]: ,]$INFO[VideoPlayer.NextStartTime, (,)]</value>
++        <value condition="!IsEmpty(Window(10000).Property(streaming-radio.Artist))">$INFO[Window(10000).Property(streaming-radio.Artist)]</value>
+         <value condition="Player.HasAudio + !Pvr.IsPlayingRadio">$INFO[MusicPlayer.Artist]</value>
+         <value condition="Player.HasAudio + Pvr.IsPlayingRadio">$INFO[MusicPlayer.ChannelName]</value>
+     </variable>
