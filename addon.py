@@ -2,7 +2,11 @@ import os
 import xml.etree.ElementTree as et
 import urlparse
 import shutil
+import requests
+import re
+import HTMLParser
 
+import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
@@ -43,11 +47,12 @@ class RadioSource():
         li = self.list_item()
         li.setPath(url)
         xbmcplugin.setResolvedUrl(handle, True, li)
-        
+
+        InfoScraper(self, url).run()
 
     def __build_art(self):
         art = {}
-        for art_type in ("thumb", "fanart"):
+        for art_type in ("thumb", "fanart", "poster", "banner", "clearart", "clearlogo", "landscape", "icon"):
             if self.info.get(art_type, None) is not None:
                 path = os.path.join(addon.getAddonInfo("path"), "artwork", self.info[art_type])
                 if os.path.isfile(path):
@@ -56,17 +61,29 @@ class RadioSource():
 
 
 class InfoScraper():
-    def __init__(self, source):
+    def __init__(self, source, stream):
         self.properties = source.scraper
+        self.stream = stream
 
     def update(self):
         if self.properties["type"] == "tunein":
             return self.__update_tunein()
 
+    def run(self):
+        xbmc.sleep(5000)
+        while xbmc.Player().isPlayingAudio() and xbmc.Player().getPlayingFile() == self.stream:
+            artist, title = self.update()
+            xbmcgui.Window(10000).setProperty("streaming-radio.Artist", artist)
+            xbmcgui.Window(10000).setProperty("streaming-radio.Title", title)
+            xbmc.sleep(10000)
+
+        clear_window_properties()
+
     def __update_tunein(self):
         html = requests.get(self.properties["url"]).text
         match = re.search(r"<h3 class=\"title\">(.+?) - (.+?)</h3>", html)
-        return match.group(1), match.group(2)
+        if match is not None:
+            return unescape(match.group(1)), unescape(match.group(2))
 
 
 def build_list():
@@ -79,6 +96,18 @@ def build_list():
         xbmcplugin.addDirectoryItem(handle=handle, url=source.url, listitem=li, isFolder=False)
 
     xbmcplugin.endOfDirectory(handle)
+
+
+def clear_window_properties():
+    properties = ("Artist", "Title")
+    window = xbmcgui.Window(10000)
+    for prop in properties:
+        window.clearProperty("streaming-radio." + prop)
+
+
+def unescape(string):
+    html_parser = HTMLParser.HTMLParser()
+    return html_parser.unescape(string)
 
 
 # Create sources file in addon_data folder
