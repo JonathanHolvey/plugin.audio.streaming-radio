@@ -1,11 +1,11 @@
 import os
 import xml.etree.ElementTree as et
 import urlparse
+import shutil
 
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
-import xbmcvfs
 
 plugin_url = sys.argv[0]
 handle = int(sys.argv[1])
@@ -56,10 +56,10 @@ def play_source(name):
 
 # Create sources file in addon_data folder
 sources_path = os.path.join(addon.getAddonInfo("path"), "sources.xml")
-if not xbmcvfs.exists(sources_path):
-    xbmcvfs.copy(os.path.join(addon.getAddonInfo("path"), "resources", "sources.xml"), sources_path)
+if not os.path.isfile(sources_path):
+    shutil.copyfile(os.path.join(addon.getAddonInfo("path"), "resources", "sources.xml"), sources_path)
 
-sources = et.fromstring(xbmcvfs.File(sources_path).read())
+sources = et.fromstring(open(sources_path, "r").read())
 params = urlparse.parse_qs(sys.argv[2][1:])
 
 if params.get("source", None) is None:
