@@ -31,6 +31,16 @@ class RadioSource():
         li.setArt(self.__build_art())
         return li
 
+    def play(self):
+        max_bitrate = int(addon.getSetting("bitrate").split(" ")[0])
+        bitrates = [bitrate for bitrate in self.streams.keys() if bitrate <= max_bitrate]
+        url = streams[min(self.streams.keys())] if len(bitrates) == 0 else self.streams[max(bitrates)]
+
+        li = self.list_item()
+        li.setPath(url)
+        xbmcplugin.setResolvedUrl(handle, True, li)
+        
+
     def __build_art(self):
         art = {}
         for art_type in ("thumb", "fanart"):
@@ -53,23 +63,6 @@ def build_list():
     xbmcplugin.endOfDirectory(handle)
 
 
-def play_source(name):
-    # Loop through sources XML to find entry with specified name
-    for source in sources.iter("radio"):
-        if name == source.find("name").text:
-            break
-
-    # Find correct bitrate stream to play as per the maximum bitrate setting
-    max_bitrate = int(addon.getSetting("bitrate").split(" ")[0])
-    streams = dict((int(stream.get("bitrate", default=0)), stream.text) for stream in source.findall("stream"))
-    bitrates = [bitrate for bitrate in streams.keys() if bitrate <= max_bitrate]
-    url = streams[min(streams.keys())] if len(bitrates) == 0 else streams[max(bitrates)]
-
-    li = create_list_item(source)
-    li.setPath(url)
-    xbmcplugin.setResolvedUrl(handle, True, li)
-
-
 # Create sources file in addon_data folder
 sources_path = os.path.join(addon.getAddonInfo("path"), "sources.xml")
 if not xbmcvfs.exists(sources_path):
@@ -81,4 +74,4 @@ params = urlparse.parse_qs(sys.argv[2][1:])
 if params.get("source", None) is None:
     build_list()
 else:
-    play_source(params["source"][0])
+    RadioSource(name=["source"][0]).play()
