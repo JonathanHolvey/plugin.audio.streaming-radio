@@ -24,6 +24,20 @@ class RadioSource():
         self.streams = dict((int(stream.get("bitrate", default=0)), stream.text) for stream in source.findall("stream"))
         self.info = dict((child.tag, child.text) for child in source if child.tag not in ("name", "stream"))
 
+    def list_item(self):
+        li = xbmcgui.ListItem(self.name, iconImage="DefaultAudio.png")
+        li.setInfo("music", {"title": self.name, "artist": self.info["tagline"]})
+        li.setArt(self.__build_art())
+        return li
+
+    def __build_art(self):
+        art = {}
+        for art_type in ("thumb", "fanart"):
+            if self.info.get(art_type, None) is not None:
+                path = os.path.join(addon.getAddonInfo("path)"), "artwork", self.info[art_type])
+                if os.path.isfile(path):
+                    art[art_type] = path
+
 
 def create_list_item(source):
     li = xbmcgui.ListItem(source.find("name").text, iconImage="DefaultAudio.png")
