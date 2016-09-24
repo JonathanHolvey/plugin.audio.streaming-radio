@@ -71,7 +71,7 @@ class InfoScraper():
 
     def run(self):
         xbmc.sleep(5000)
-        while xbmc.Player().getPlayingFile() == self.stream:
+        while xbmc.Player().isPlayingAudio() and xbmc.Player().getPlayingFile() == self.stream:
             artist, title = self.update()
             xbmcgui.Window(10000).setProperty("streaming-radio.Artist", artist)
             xbmcgui.Window(10000).setProperty("streaming-radio.Title", title)
