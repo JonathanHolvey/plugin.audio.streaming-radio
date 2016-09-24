@@ -86,10 +86,10 @@ sources_path = os.path.join(addon.getAddonInfo("path"), "sources.xml")
 if not os.path.isfile(sources_path):
     shutil.copyfile(os.path.join(addon.getAddonInfo("path"), "resources", "sources.xml"), sources_path)
 
-sources = et.fromstring(open(sources_path, "r").read())
+sources = et.parse(sources_path)
 params = urlparse.parse_qs(sys.argv[2][1:])
 
 if params.get("source", None) is None:
     build_list()
 else:
-    RadioSource(name=["source"][0]).play()
+    RadioSource(name=params["source"]).play()
