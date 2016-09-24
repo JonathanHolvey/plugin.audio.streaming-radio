@@ -74,4 +74,4 @@ params = urlparse.parse_qs(sys.argv[2][1:])
 if params.get("source", None) is None:
     build_list()
 else:
-    RadioSource(name=["source"][0]).play()
+    RadioSource(name=params["source"]).play()
