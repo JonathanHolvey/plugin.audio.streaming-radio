@@ -12,6 +12,19 @@ handle = int(sys.argv[1])
 addon = xbmcaddon.Addon()
 
 
+class RadioSource():
+    def __init__(self, xml=None, name=None):
+        if xml is None:
+            # Load XML node from name
+            for source in xml.iter("radio"):
+                if name == source.find("name").text:
+                    break
+
+        self.name = source.find("name").text
+        self.streams = dict((int(stream.get("bitrate", default=0)), stream.text) for stream in source.findall("stream"))
+        self.info = dict((child.tag, child.text) for child in source if child.tag not in ("name", "stream"))
+
+
 def create_list_item(source):
     li = xbmcgui.ListItem(source.find("name").text, iconImage="DefaultAudio.png")
     li.setInfo("music", {
