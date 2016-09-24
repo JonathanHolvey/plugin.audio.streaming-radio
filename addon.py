@@ -22,8 +22,12 @@ class RadioSource():
 
         self.name = xml.find("name").text
         self.streams = dict((int(stream.get("bitrate", default=0)), stream.text) for stream in xml.findall("stream"))
-        self.info = dict((child.tag, child.text) for child in xml if child.tag not in ("name", "stream"))
+        self.info = dict((child.tag, child.text) for child in xml if child.tag not in ("name", "stream", "scraper"))
         self.url = "{}?source={}".format(plugin_url, self.name)
+
+        if xml.find("scraper") is not None:
+            self.scraper = dict((child.tag, child.text) for child in xml.find("scraper"))
+            self.scraper["type"] = xml.find("scraper").get("type", default=None)
 
     def list_item(self):
         li = xbmcgui.ListItem(self.name, iconImage="DefaultAudio.png")
@@ -49,6 +53,20 @@ class RadioSource():
                 if os.path.isfile(path):
                     art[art_type] = path
         return art
+
+
+class InfoScraper():
+    def __init__(self, source):
+        self.properties = source.scraper
+
+    def update(self):
+        if self.properties["type"] == "tunein":
+            return self.__update_tunein()
+
+    def __update_tunein(self):
+        html = requests.get(self.properties["url"]).text
+        match = re.search(r"<h3 class=\"title\">(.+?) - (.+?)</h3>", html)
+        return match.group(1), match.group(2)
 
 
 def build_list():
