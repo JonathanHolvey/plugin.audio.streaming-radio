@@ -4,6 +4,7 @@ import urlparse
 import shutil
 import requests
 import re
+import HTMLParser
 
 import xbmc
 import xbmcgui
@@ -82,7 +83,7 @@ class InfoScraper():
         html = requests.get(self.properties["url"]).text
         match = re.search(r"<h3 class=\"title\">(.+?) - (.+?)</h3>", html)
         if match is not None:
-            return match.group(1), match.group(2)
+            return unescape(match.group(1)), unescape(match.group(2))
 
 
 def build_list():
@@ -102,6 +103,11 @@ def clear_window_properties():
     window = xbmcgui.Window(10000)
     for prop in properties:
         window.clearProperty("streaming-radio." + prop)
+
+
+def unescape(string):
+    html_parser = HTMLParser.HTMLParser()
+    return html_parser.unescape(string)
 
 
 # Create sources file in addon_data folder
