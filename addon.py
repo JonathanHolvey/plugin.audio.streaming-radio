@@ -19,37 +19,45 @@ addon = xbmcaddon.Addon()
 class RadioSource():
     def __init__(self, xml=None, name=None):
         if xml is None:
-            # Load XML node from name
+            # Load XML node using source name
             for xml in sources.iter("radio"):
                 if name == xml.find("name").text:
                     break
 
+        # Load source properties from XML
         self.name = xml.find("name").text
         self.streams = dict((int(stream.get("bitrate", default=0)), stream.text) for stream in xml.findall("stream"))
         self.info = dict((child.tag, child.text) for child in xml if child.tag not in ("name", "stream", "scraper"))
         self.url = "{}?source={}".format(plugin_url, self.name)
 
+        # Load scraper properties
         if xml.find("scraper") is not None:
             self.scraper = dict((child.tag, child.text) for child in xml.find("scraper"))
             self.scraper["type"] = xml.find("scraper").get("type", default=None)
 
+    # Generate a Kodi list item from the radio source
     def list_item(self):
         li = xbmcgui.ListItem(self.name, iconImage="DefaultAudio.png")
         li.setInfo("music", {"title": self.name, "artist": self.info.get("tagline", None)})
         li.setArt(self.__build_art())
         return li
 
+    # Start playing the radio source
     def play(self):
+        # Detect correct bitrate stream to play
         max_bitrate = int(addon.getSetting("bitrate").split(" ")[0])
         bitrates = [bitrate for bitrate in self.streams.keys() if bitrate <= max_bitrate]
         url = streams[min(self.streams.keys())] if len(bitrates) == 0 else self.streams[max(bitrates)]
 
+        # Create list item with stream URL and send to Kodi
         li = self.list_item()
         li.setPath(url)
         xbmcplugin.setResolvedUrl(handle, True, li)
 
+        # Start scraping track info
         InfoScraper(self, url).run()
 
+    # Create dictionary of available artwork files to supply to list item
     def __build_art(self):
         art = {}
         for art_type in ("thumb", "fanart", "poster", "banner", "clearart", "clearlogo", "landscape", "icon"):
@@ -70,15 +78,18 @@ class InfoScraper():
             return self.__update_tunein()
 
     def run(self):
-        xbmc.sleep(5000)
+        xbmc.sleep(5000)  # Wait for playback to start
+        # Retrieve track information every 10 seconds until playback stops
         while xbmc.Player().isPlayingAudio() and xbmc.Player().getPlayingFile() == self.stream:
             artist, title = self.update()
             xbmcgui.Window(10000).setProperty("streaming-radio.Artist", artist)
             xbmcgui.Window(10000).setProperty("streaming-radio.Title", title)
             xbmc.sleep(10000)
 
+        # Remove window properties after playback stops
         clear_window_properties()
 
+    # Scrape track info from Tunein website
     def __update_tunein(self):
         html = requests.get(self.properties["url"]).text
         match = re.search(r"<h3 class=\"title\">(.+?) - (.+?)</h3>", html)
@@ -86,6 +97,7 @@ class InfoScraper():
             return unescape(match.group(1)), unescape(match.group(2))
 
 
+# Build a list of radio stations in the Kodi GUI
 def build_list():
     xbmcplugin.setContent(handle, "audio")
     # Loop through sources XML and create list item for each entry
@@ -115,9 +127,11 @@ sources_path = os.path.join(addon.getAddonInfo("path"), "sources.xml")
 if not os.path.isfile(sources_path):
     shutil.copyfile(os.path.join(addon.getAddonInfo("path"), "resources", "sources.xml"), sources_path)
 
+# Load sources XML and URL parameters
 sources = et.parse(sources_path)
 params = urlparse.parse_qs(sys.argv[2][1:])
 
+# Run addon
 if params.get("source", None) is None:
     build_list()
 else:
