@@ -52,7 +52,7 @@ class RadioSource():
 
     def __build_art(self):
         art = {}
-        for art_type in ("thumb", "fanart"):
+        for art_type in ("thumb", "fanart", "poster", "banner", "clearart", "clearlogo", "landscape", "icon"):
             if self.info.get(art_type, None) is not None:
                 path = os.path.join(addon.getAddonInfo("path"), "artwork", self.info[art_type])
                 if os.path.isfile(path):
@@ -99,7 +99,7 @@ def build_list():
 
 
 def clear_window_properties():
-    properties = ["Artist", "Title"]
+    properties = ("Artist", "Title")
     window = xbmcgui.Window(10000)
     for prop in properties:
         window.clearProperty("streaming-radio." + prop)
