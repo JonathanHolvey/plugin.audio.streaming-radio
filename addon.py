@@ -81,9 +81,12 @@ class InfoScraper():
         xbmc.sleep(5000)  # Wait for playback to start
         # Retrieve track information every 10 seconds until playback stops
         while xbmc.Player().isPlayingAudio() and xbmc.Player().getPlayingFile() == self.stream:
-            artist, title = self.update()
-            xbmcgui.Window(10000).setProperty("streaming-radio.Artist", artist)
-            xbmcgui.Window(10000).setProperty("streaming-radio.Title", title)
+            try:
+                artist, title = self.update()
+                xbmcgui.Window(10000).setProperty("streaming-radio.Artist", artist)
+                xbmcgui.Window(10000).setProperty("streaming-radio.Title", title)
+            except:
+                pass
             xbmc.sleep(10000)
 
         # Remove window properties after playback stops
