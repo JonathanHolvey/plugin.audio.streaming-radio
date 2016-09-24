@@ -27,7 +27,7 @@ class RadioSource():
 
     def list_item(self):
         li = xbmcgui.ListItem(self.name, iconImage="DefaultAudio.png")
-        li.setInfo("music", {"title": self.name, "artist": self.info["tagline"]})
+        li.setInfo("music", {"title": self.name, "artist": self.info.get("tagline", None)})
         li.setArt(self.__build_art())
         return li
 
@@ -38,6 +38,7 @@ class RadioSource():
                 path = os.path.join(addon.getAddonInfo("path"), "artwork", self.info[art_type])
                 if os.path.isfile(path):
                     art[art_type] = path
+        return art
 
 
 def build_list():
