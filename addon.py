@@ -32,7 +32,7 @@ def create_list_item(source):
         "artist": source.find("tagline").text
     })
     li.setArt({
-        "thumb": os.path.join(addon.getAddonInfo("path"), "artwork", source.find("thumbnail").text),
+        "thumb": os.path.join(addon.getAddonInfo("path"), "artwork", source.find("thumb").text),
         "fanart": os.path.join(addon.getAddonInfo("path"), "artwork", source.find("fanart").text)
     })
     return li
