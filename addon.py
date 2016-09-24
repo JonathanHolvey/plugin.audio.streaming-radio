@@ -16,13 +16,14 @@ class RadioSource():
     def __init__(self, xml=None, name=None):
         if xml is None:
             # Load XML node from name
-            for source in xml.iter("radio"):
-                if name == source.find("name").text:
+            for xml in sources.iter("radio"):
+                if name == xml.find("name").text:
                     break
 
-        self.name = source.find("name").text
-        self.streams = dict((int(stream.get("bitrate", default=0)), stream.text) for stream in source.findall("stream"))
-        self.info = dict((child.tag, child.text) for child in source if child.tag not in ("name", "stream"))
+        self.name = xml.find("name").text
+        self.streams = dict((int(stream.get("bitrate", default=0)), stream.text) for stream in xml.findall("stream"))
+        self.info = dict((child.tag, child.text) for child in xml if child.tag not in ("name", "stream"))
+        self.url = "{}?source={}".format(plugin_url, self.name)
 
     def list_item(self):
         li = xbmcgui.ListItem(self.name, iconImage="DefaultAudio.png")
@@ -34,32 +35,19 @@ class RadioSource():
         art = {}
         for art_type in ("thumb", "fanart"):
             if self.info.get(art_type, None) is not None:
-                path = os.path.join(addon.getAddonInfo("path)"), "artwork", self.info[art_type])
+                path = os.path.join(addon.getAddonInfo("path"), "artwork", self.info[art_type])
                 if os.path.isfile(path):
                     art[art_type] = path
-
-
-def create_list_item(source):
-    li = xbmcgui.ListItem(source.find("name").text, iconImage="DefaultAudio.png")
-    li.setInfo("music", {
-        "title": source.find("name").text,
-        "artist": source.find("tagline").text
-    })
-    li.setArt({
-        "thumb": os.path.join(addon.getAddonInfo("path"), "artwork", source.find("thumb").text),
-        "fanart": os.path.join(addon.getAddonInfo("path"), "artwork", source.find("fanart").text)
-    })
-    return li
 
 
 def build_list():
     xbmcplugin.setContent(handle, "audio")
     # Loop through sources XML and create list item for each entry
-    for source in sources.iter("radio"):
-        li = create_list_item(source)
+    for item in sources.iter("radio"):
+        source = RadioSource(xml=item)
+        li = source.list_item()
         li.setProperty("IsPlayable", "true")
-        url = "{}?source={}".format(plugin_url, source.find("name").text)
-        xbmcplugin.addDirectoryItem(handle=handle, url=url, listitem=li, isFolder=False)
+        xbmcplugin.addDirectoryItem(handle=handle, url=source.url, listitem=li, isFolder=False)
 
     xbmcplugin.endOfDirectory(handle)
 
