@@ -8,5 +8,8 @@
 		<description>Chill Out Digital Radio - Buddha Radio has a very simple philosophy - to bring you the very best music that makes you feel good and feeds your soul.</description>
 		<fanart>buddha-fanart.jpg</fanart>
 		<thumb>buddha-thumb.png</thumb>
+		<scraper type="tunein">
+			<url>http://tunein.com/radio/Buddha-Radio-s172072/</url>
+		</scraper>
 	</radio>
 </sources>
