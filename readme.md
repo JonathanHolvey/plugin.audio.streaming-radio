@@ -28,6 +28,35 @@ A new radio station can be added by creating a new `<radio>...</radio>` section 
 
 ## Adding artwork
 
-Artwork images should be placed inside the `artwork` folder, and the filenames added to the `fanart` and `thumb` fields in `sources.xml`.
+Artwork images for the radio station should be placed inside the `artwork` folder, and the filenames added to the `fanart` and `thumb` fields in `sources.xml`. Other artwork types can also be defined, however they have not been tested.
+
+## Track info
+
+The Streaming Radio addon allows the scraping of now playing track infomation from the [Tunein website](http://tunein.com), however getting this information to show up in your Kodi skin is not straightforward.
+
+Since there is no standard way of pushing track info to the Kodi OSD, the skin must be modified to allow the information to be displayed. Currently, support is provided for the Xperience1080 skin, through a patch file which is shipped with the addon. This can be found in the `resources/skins` folder, and once applied, the current artist's name and the track title will be displayed in the skin.
+
+A track info scraper can be defined for a radio station by supplying a `<scraper>` node in `sources.xml`:
+
+```xml
+<radio>
+	...
+	<scraper type="tunein">
+		<url>http://tunein.com/radio/Buddha-Radio-s172072/</url>
+	</scraper>
+</radio>
+```
+
+The `url` can be found by searching for your radio station on the Tunein website and copying the URL from your browser's address bar. If the track info is displayed on the Tunein website, then it should be scraped into Kodi successfully.
+
+### To do:
+
+1. Pull track artwork from the web and display it in the skin
+2. Increase the time between requests to tunein.com by looking up the track's duration and predicting when it will end
+3. Implement a more elegent track info scraper (using, for example Lightstreamer) for radio stations which support it
+4. Apply a delay to the track info change to sync it with the audio (Tunein updates10-15 seconds before the track changes)
+5. Improve skin integration
+6. Automatically apply skin patches on first run
+7. Add support for other skins - pull requests welcome
 
 [screenshot]: http://i.imgur.com/UbNqJ6X.png
