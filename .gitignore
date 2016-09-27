@@ -1,1 +1,2 @@
-sources.xml 
+sources/*.xml
+!sources/buddha.xml 

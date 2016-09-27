@@ -15,20 +15,19 @@ plugin_url = sys.argv[0]
 handle = int(sys.argv[1])
 addon = xbmcaddon.Addon()
 
+sources_path = os.path.join(addon.getAddonInfo("path"), "sources")
+
 
 class RadioSource():
-    def __init__(self, xml=None, name=None):
-        if xml is None:
-            # Load XML node using source name
-            for xml in sources.iter("radio"):
-                if name == xml.find("name").text:
-                    break
+    def __init__(self, file):
+        # Load XML
+        xml = et.parse(os.path.join(sources_path, file + ".xml")).getroot()
 
         # Load source properties from XML
         self.name = xml.find("name").text
         self.streams = dict((int(stream.get("bitrate", default=0)), stream.text) for stream in xml.findall("stream"))
         self.info = dict((child.tag, child.text) for child in xml if child.tag not in ("name", "stream", "scraper"))
-        self.url = "{}?source={}".format(plugin_url, self.name)
+        self.url = "{}?source={}".format(plugin_url, file)
 
         # Load scraper properties
         if xml.find("scraper") is not None:
@@ -104,8 +103,8 @@ class InfoScraper():
 def build_list():
     xbmcplugin.setContent(handle, "audio")
     # Loop through sources XML and create list item for each entry
-    for item in sources.iter("radio"):
-        source = RadioSource(xml=item)
+    for file in sources:
+        source = RadioSource(file)
         li = source.list_item()
         li.setProperty("IsPlayable", "true")
         xbmcplugin.addDirectoryItem(handle=handle, url=source.url, listitem=li, isFolder=False)
@@ -125,17 +124,20 @@ def unescape(string):
     return html_parser.unescape(string)
 
 
-# Create sources file in addon_data folder
-sources_path = os.path.join(addon.getAddonInfo("path"), "sources.xml")
-if not os.path.isfile(sources_path):
-    shutil.copyfile(os.path.join(addon.getAddonInfo("path"), "resources", "sources.xml"), sources_path)
-
-# Load sources XML and URL parameters
-sources = et.parse(sources_path)
+# Extract URL parameters
 params = urlparse.parse_qs(sys.argv[2][1:])
+
+# Load source filenames into list
+sources = []
+for source in os.listdir(sources_path):
+    source_file = os.path.join(sources_path, source)
+    if os.path.isfile(source_file):
+        name, extension = os.path.splitext(source)
+        if extension == ".xml":
+            sources.append(name)
 
 # Run addon
 if params.get("source", None) is None:
     build_list()
 else:
-    RadioSource(name=params["source"]).play()
+    RadioSource(params["source"][0]).play()

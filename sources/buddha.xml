@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<source>
+	<stream bitrate="128">http://stream.scahw.com.au/live/buddha_128.stream/playlist.m3u8</stream>
+	<stream bitrate="32">http://stream.scahw.com.au/live/buddha_32.stream/playlist.m3u8</stream>
+	<name>Buddha Radio</name>
+	<tagline>Tune in, chill out</tagline>
+	<description>Chill Out Digital Radio - Buddha Radio has a very simple philosophy - to bring you the very best music that makes you feel good and feeds your soul.</description>
+	<fanart>buddha-fanart.jpg</fanart>
+	<thumb>buddha-thumb.png</thumb>
+	<scraper type="tunein">
+		<url>http://tunein.com/radio/Buddha-Radio-s172072/</url>
+	</scraper>
+</source>
