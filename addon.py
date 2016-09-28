@@ -125,7 +125,7 @@ def unescape(string):
 
 
 # Extract URL parameters
-params = urlparse.parse_qs(sys.argv[2][1:])
+params = dict((key, value_list[0]) for key, value_list in urlparse.parse_qs(sys.argv[2][1:]).items())
 
 # Load source filenames into list
 sources = []
@@ -140,4 +140,4 @@ for source in os.listdir(sources_path):
 if params.get("source", None) is None:
     build_list()
 else:
-    RadioSource(params["source"][0]).play()
+    RadioSource(params["source"]).play()
