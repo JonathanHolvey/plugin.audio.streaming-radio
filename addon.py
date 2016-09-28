@@ -33,6 +33,8 @@ class RadioSource():
         if xml.find("scraper") is not None:
             self.scraper = dict((child.tag, child.text) for child in xml.find("scraper"))
             self.scraper["type"] = xml.find("scraper").get("type", default=None)
+        else:
+            self.scraper = None
 
     # Generate a Kodi list item from the radio source
     def list_item(self):
@@ -54,7 +56,8 @@ class RadioSource():
         xbmcplugin.setResolvedUrl(handle, True, li)
 
         # Start scraping track info
-        InfoScraper(self, url).run()
+        if self.scraper is not None:
+            InfoScraper(self, url).run()
 
     # Create dictionary of available artwork files to supply to list item
     def __build_art(self):
