@@ -57,4 +57,8 @@ The `url` can be found by searching for your radio station on the Tunein website
 6. Automatically apply skin patches on first run
 7. Add support for other skins - pull requests welcome
 
+## Licence
+
+This software is distributed under the GNU General Public License v3. Copyright 2016 Jonathan Holvey.
+
 [screenshot]: http://i.imgur.com/UbNqJ6X.png
