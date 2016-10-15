@@ -10,6 +10,7 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
+from lib import skinpatch
 
 plugin_url = sys.argv[0]
 handle = int(sys.argv[1])
@@ -126,6 +127,10 @@ def unescape(string):
     html_parser = HTMLParser.HTMLParser()
     return html_parser.unescape(string)
 
+
+# Apply skin patch to allow display of track info
+patcher = skinpatch.SkinPatcher()
+patcher.patch()
 
 # Extract URL parameters
 params = dict((key, value_list[0]) for key, value_list in urlparse.parse_qs(sys.argv[2][1:]).items())
