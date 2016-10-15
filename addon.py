@@ -81,10 +81,6 @@ class InfoScraper():
             return self.__update_tunein()
 
     def run(self):
-        # Patch skin to allow track info to be displayed
-        patch = SkinPatch()
-        patch.apply()
-
         xbmc.sleep(5000)  # Wait for playback to start
         # Retrieve track information every 10 seconds until playback stops
         while xbmc.Player().isPlayingAudio() and xbmc.Player().getPlayingFile() == self.stream:
@@ -98,7 +94,6 @@ class InfoScraper():
 
         # Remove window properties after playback stops
         clear_window_properties()
-        patch.revert()
 
     # Scrape track info from Tunein website
     def __update_tunein(self):
@@ -133,6 +128,8 @@ def unescape(string):
     return html_parser.unescape(string)
 
 
+# Patch skin to allow track info to be displayed
+SkinPatch().slide()
 
 # Extract URL parameters
 params = dict((key, value_list[0]) for key, value_list in urlparse.parse_qs(sys.argv[2][1:]).items())
