@@ -129,7 +129,7 @@ def unescape(string):
 
 
 # Patch skin to allow track info to be displayed
-SkinPatch().slide()
+SkinPatch().sideload()
 
 # Extract URL parameters
 params = dict((key, value_list[0]) for key, value_list in urlparse.parse_qs(sys.argv[2][1:]).items())

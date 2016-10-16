@@ -19,6 +19,7 @@ class SkinPatch():
         for patch_file in os.listdir(patch_path):
             if patch_file.startswith(self.skin_id):
                 self.patches.append(os.path.join(patch_path, patch_file))
+        self.patches.sort(reverse=True)
 
     # Apply the patch using python-patch https://github.com/techtonik/python-patch
     def apply(self):
@@ -39,7 +40,7 @@ class SkinPatch():
         return False
 
     # Apply patch and reload skin, then revert files
-    def slide(self):
+    def sideload(self):
         if xbmcgui.Window(10000).getProperty("skinpatch.status") != "patched":
             if self.apply():
                 xbmc.executebuiltin("ReloadSkin()")
