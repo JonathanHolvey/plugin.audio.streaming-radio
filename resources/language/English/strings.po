@@ -17,6 +17,18 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgctxt "#32001"
+msgctxt "#30001"
 msgid "Maximum bitrate"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Display track info by temporarily modifying the skin"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Track information can be displayed by temporarily modifying the skin."
+msgstr ""
+
+msgctxt "#30004"
+msgid "Would you like to allow this?"
 msgstr ""

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
 	<category>
-		<setting id="bitrate" label="32001" type="labelenum" values="128 kb/s|64 kb/s|32 kb/s" default="128 kb/s"/>
+		<setting id="bitrate" label="30001" type="labelenum" values="128 kb/s|64 kb/s|32 kb/s" default="128 kb/s"/>
+		<setting id="skin-patch" label="30002" type="bool" default="false"/>
+		<setting id="skin-patch-prompt" visible="false" type="bool" default="true"/>
 	</category>
 </settings>
