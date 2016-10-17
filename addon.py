@@ -129,7 +129,7 @@ def unescape(string):
 
 
 # Request permission from user to modify skin files
-def patch_skin():
+def prompt_skinpatch():
     if addon.getSetting("skin-patch-prompt") == "true":
         if xbmcgui.Dialog().yesno(heading=addon.getAddonInfo("name"), line1=addon.getLocalizedString(30003),
                 line2=addon.getLocalizedString(30004)):
@@ -156,5 +156,5 @@ for source in os.listdir(sources_path):
 if params.get("source", None) is None:
     build_list()
 else:
-    patch_skin()
+    prompt_skinpatch()
     RadioSource(params["source"]).play()
