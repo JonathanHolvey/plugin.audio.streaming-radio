@@ -30,9 +30,11 @@ Artwork images for the radio station should be placed inside the `artwork` folde
 
 ## Track info
 
-The Streaming Radio addon allows the scraping of now playing track infomation from the [Tunein website](http://tunein.com), however getting this information to show up in your Kodi skin is not straightforward.
+The Streaming Radio addon allows the scraping of now playing track infomation from the [Tunein website](http://tunein.com).
 
-Since there is no standard way of pushing track info to the Kodi OSD, the skin must be modified to allow the information to be displayed. Currently, support is provided for the Xperience1080 skin, through a patch file which is shipped with the addon. This can be found in the `resources/skins` folder, and once applied, the current artist's name and the track title will be displayed in the skin.
+Since there is no standard way of pushing track info to the Kodi OSD, the skin is modified to allow the information to be displayed. This is achieved through a patch file which is shipped with the addon, and applied to the skin before starting playback. The skin is refreshed, and the patch is removed, leaving the skin files intact.
+
+**NB:** Xperience1080 is the only skin that currently supports displaying track information.
 
 A track info scraper can be defined for a radio station by supplying a `<scraper>` node in the XML source file:
 
@@ -54,7 +56,7 @@ The `url` can be found by searching for your radio station on the Tunein website
 3. Implement a more elegent track info scraper (using, for example Lightstreamer) for radio stations which support it
 4. Apply a delay to the track info change to sync it with the audio (Tunein updates10-15 seconds before the track changes)
 5. Improve skin integration
-6. Automatically apply skin patches on first run
+6. ~~Automatically apply skin patch on first run~~ *Done*
 7. Add support for other skins - pull requests welcome
 
-[screenshot]: http://i.imgur.com/UbNqJ6X.png
+[screenshot]: http://i.imgur.com/qC6IHNK.png

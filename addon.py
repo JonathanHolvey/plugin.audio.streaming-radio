@@ -10,6 +10,7 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
+from resources.lib.skinpatch import SkinPatch
 
 plugin_url = sys.argv[0]
 handle = int(sys.argv[1])
@@ -127,6 +128,18 @@ def unescape(string):
     return html_parser.unescape(string)
 
 
+# Request permission from user to modify skin files
+def prompt_skinpatch():
+    if addon.getSetting("skin-patch-prompt") == "true":
+        if xbmcgui.Dialog().yesno(heading=addon.getAddonInfo("name"), line1=addon.getLocalizedString(30003),
+                line2=addon.getLocalizedString(30004)):
+            addon.setSetting("skin-patch", "true")
+        addon.setSetting("skin-patch-prompt", "false")
+    # Patch skin to allow track info to be displayed
+    if addon.getSetting("skin-patch") == "true":
+        SkinPatch().sideload()
+
+
 # Extract URL parameters
 params = dict((key, value_list[0]) for key, value_list in urlparse.parse_qs(sys.argv[2][1:]).items())
 
@@ -143,4 +156,5 @@ for source in os.listdir(sources_path):
 if params.get("source", None) is None:
     build_list()
 else:
+    prompt_skinpatch()
     RadioSource(params["source"]).play()
