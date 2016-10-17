@@ -10,7 +10,7 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
-from lib.skinpatch import SkinPatch
+from resources.lib.skinpatch import SkinPatch
 
 plugin_url = sys.argv[0]
 handle = int(sys.argv[1])
