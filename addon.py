@@ -49,16 +49,16 @@ class RadioSource():
         # Detect correct bitrate stream to play
         max_bitrate = int(addon.getSetting("bitrate").split(" ")[0])
         bitrates = [bitrate for bitrate in self.streams.keys() if bitrate <= max_bitrate]
-        url = streams[min(self.streams.keys())] if len(bitrates) == 0 else self.streams[max(bitrates)]
+        self.stream_url = streams[min(self.streams.keys())] if len(bitrates) == 0 else self.streams[max(bitrates)]
 
         # Create list item with stream URL and send to Kodi
         li = self.list_item()
-        li.setPath(url)
+        li.setPath(self.stream_url)
         xbmcplugin.setResolvedUrl(handle, True, li)
 
         # Start scraping track info
         if self.scraper is not None:
-            InfoScraper(self, url).run()
+            InfoScraper(self).run()
 
     # Create dictionary of available artwork files to supply to list item
     def __build_art(self):
@@ -72,9 +72,9 @@ class RadioSource():
 
 
 class InfoScraper():
-    def __init__(self, source, stream):
+    def __init__(self, source):
         self.properties = source.scraper
-        self.stream = stream
+        self.stream = source.stream_url
         self.window = xbmcgui.Window(10000)  # Attach properties to the home window
         self.window_properties = []
 
