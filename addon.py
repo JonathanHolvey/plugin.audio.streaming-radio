@@ -77,19 +77,22 @@ class InfoScraper():
         self.stream = source.stream_url
         self.window = xbmcgui.Window(10000)  # Attach properties to the home window
         self.window_properties = []
+        self.api_key = None
+        self.track_info = {}
 
     def update(self):
         if self.properties["type"] == "tunein":
-            return self.__update_tunein()
+            self.__update_tunein()
+            self.get_track_info()
 
     def run(self):
         xbmc.sleep(5000)  # Wait for playback to start
         # Retrieve track information every 10 seconds until playback stops
         while xbmc.Player().isPlayingAudio() and xbmc.Player().getPlayingFile() == self.stream:
             try:
-                artist, title = self.update()
-                self.set_window_property("Artist", artist)
-                self.set_window_property("Title", title)
+                self.update()
+                self.set_window_property("Artist", self.track_info["artist"])
+                self.set_window_property("Title", self.track_info["title"])
             except:
                 pass
             xbmc.sleep(10000)
@@ -107,12 +110,23 @@ class InfoScraper():
         for name in self.window_properties:
             self.window.clearProperty(name)
 
+    # Retrieve track information from last.fm API
+    def get_track_info(self):
+        if self.api_key is None:
+            self.api_key = requests.get("http://dev.rocketchilli.com/keystore/ba7000f9-7ef4-4ace-bca2-f527cdffb393").json()["api-key"]
+        # Call last.fm API to request track information
+        request_url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key={}&artist={}&track={}&format=json".format(self.api_key, self.track_info["artist"], self.track_info["title"])
+        info = requests.get(request_url).json()
+        self.track_info["duration"] = info["track"]["duration"]
+        self.track_info["thumb"] = info["track"]["album"]["image"][1]["#text"]
+
     # Scrape track info from Tunein website
     def __update_tunein(self):
         html = requests.get(self.properties["url"]).text
         match = re.search(r"<h3 class=\"title\">(.+?) - (.+?)</h3>", html)
         if match is not None:
-            return unescape(match.group(1)), unescape(match.group(2))
+            self.track_info["artist"] = unescape(match.group(1))
+            self.track_info["title"] = unescape(match.group(2))
 
 
 # Build a list of radio stations in the Kodi GUI
