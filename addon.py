@@ -75,6 +75,8 @@ class InfoScraper():
     def __init__(self, source, stream):
         self.properties = source.scraper
         self.stream = stream
+        self.window = xbmcgui.Window(10000)  # Attach properties to the home window
+        self.window_properties = []
 
     def update(self):
         if self.properties["type"] == "tunein":
@@ -86,14 +88,24 @@ class InfoScraper():
         while xbmc.Player().isPlayingAudio() and xbmc.Player().getPlayingFile() == self.stream:
             try:
                 artist, title = self.update()
-                xbmcgui.Window(10000).setProperty("streaming-radio.Artist", artist)
-                xbmcgui.Window(10000).setProperty("streaming-radio.Title", title)
+                self.set_window_property("Artist", artist)
+                self.set_window_property("Title", title)
             except:
                 pass
             xbmc.sleep(10000)
 
         # Remove window properties after playback stops
-        clear_window_properties()
+        self.clear_window_properties()
+
+    def set_window_property(self, name, value):
+        name = addon.getAddonInfo("id") + "." + name
+        self.window.setProperty(name, value)
+        if name not in self.window_properties:
+            self.window_properties.append(name)
+
+    def clear_window_properties(self):
+        for name in self.window_properties:
+            self.window.clearProperty(name)
 
     # Scrape track info from Tunein website
     def __update_tunein(self):
@@ -114,13 +126,6 @@ def build_list():
         xbmcplugin.addDirectoryItem(handle=handle, url=source.url, listitem=li, isFolder=False)
 
     xbmcplugin.endOfDirectory(handle)
-
-
-def clear_window_properties():
-    properties = ("Artist", "Title")
-    window = xbmcgui.Window(10000)
-    for prop in properties:
-        window.clearProperty("streaming-radio." + prop)
 
 
 def unescape(string):

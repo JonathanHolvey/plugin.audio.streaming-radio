@@ -26,11 +26,11 @@ index c8b627f..635d616 100644
      </controls>
 +    <includes>
 +        <variable name="NowPlayingTitle">
-+            <value condition="!IsEmpty(Window(10000).Property(streaming-radio.Title))">$INFO[Window(10000).Property(streaming-radio.Title)]</value>
++            <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Title))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Title)]</value>
 +            <value>$INFO[MusicPlayer.PlaylistPosition,,. ]$INFO[MusicPlayer.Title]</value>
 +        </variable>
 +        <variable name="NowPlayingSubTitle">
-+            <value condition="!IsEmpty(Window(10000).Property(streaming-radio.Artist))">$INFO[Window(10000).Property(streaming-radio.Artist)]</value>
++            <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Artist))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Artist)]</value>
 +            <value>$INFO[MusicPlayer.Artist]$INFO[MusicPlayer.Album, • ,]$INFO[MusicPlayer.Year, • ,]</value>
 +        </variable>
 +    </includes>
@@ -43,14 +43,14 @@ index 577b074..7078b90 100644
      <variable name="NowPlayingTitle">
          <value condition="Player.HasVideo + !Pvr.IsPlayingTv">$INFO[VideoPlayer.Title]</value>
          <value condition="Player.HasVideo + Pvr.IsPlayingTv">$INFO[VideoPlayer.ChannelName,,: ]$INFO[VideoPlayer.Title]</value>
-+        <value condition="!IsEmpty(Window(10000).Property(streaming-radio.Title))">$INFO[Window(10000).Property(streaming-radio.Title)]</value>
++        <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Title))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Title)]</value>
          <value>$INFO[MusicPlayer.Title]</value>
      </variable>
  
      <variable name="NowPlayingSubTitle">
          <value condition="Player.HasVideo + !Pvr.IsPlayingTv">$INFO[Player.FinishTime,$LOCALIZE[31371] ,]</value>
          <value condition="Player.HasVideo + Pvr.IsPlayingTv">$INFO[VideoPlayer.NextTitle,$LOCALIZE[19031]: ,]$INFO[VideoPlayer.NextStartTime, (,)]</value>
-+        <value condition="!IsEmpty(Window(10000).Property(streaming-radio.Artist))">$INFO[Window(10000).Property(streaming-radio.Artist)]</value>
++        <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Artist))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Artist)]</value>
          <value condition="Player.HasAudio + !Pvr.IsPlayingRadio">$INFO[MusicPlayer.Artist]</value>
          <value condition="Player.HasAudio + Pvr.IsPlayingRadio">$INFO[MusicPlayer.ChannelName]</value>
      </variable>
