@@ -79,11 +79,18 @@ class InfoScraper():
         self.window_properties = []
         self.api_key = None
         self.nowplaying = {"station": source.name}
+        self.nowplaying_hash = hash(frozenset(self.nowplaying.items()))
 
     def update(self):
         if self.properties["type"] == "tunein":
             self.__update_tunein()
-        self.get_track_info()
+        # Compare now playing dictionary against hash to check for changes
+        if self.nowplaying_hash != hash(frozenset(self.nowplaying.items())):
+            self.get_track_info()
+            # Push track info to skin as window properties
+            for name, value in self.nowplaying.items():
+                self.set_window_property(name, value)
+            self.nowplaying_hash = hash(frozenset(self.nowplaying.items()))
 
     def run(self):
         xbmc.sleep(5000)  # Wait for playback to start
@@ -91,14 +98,10 @@ class InfoScraper():
         while xbmc.Player().isPlayingAudio() and xbmc.Player().getPlayingFile() == self.stream:
             try:
                 self.update()
-                for name, value in self.nowplaying.items():
-                    self.set_window_property(name, value)
             except:
                 pass
             xbmc.sleep(10000)
-
-        # Remove window properties after playback stops
-        self.clear_window_properties()
+        self.clear_window_properties()  # Remove window properties after playback stops
 
     def set_window_property(self, name, value):
         name = addon.getAddonInfo("id") + "." + name
