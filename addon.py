@@ -78,12 +78,12 @@ class InfoScraper():
         self.window = xbmcgui.Window(10000)  # Attach properties to the home window
         self.window_properties = []
         self.api_key = None
-        self.track_info = {}
+        self.nowplaying = {"station": source.name}
 
     def update(self):
         if self.properties["type"] == "tunein":
             self.__update_tunein()
-            self.get_track_info()
+        self.get_track_info()
 
     def run(self):
         xbmc.sleep(5000)  # Wait for playback to start
@@ -91,8 +91,8 @@ class InfoScraper():
         while xbmc.Player().isPlayingAudio() and xbmc.Player().getPlayingFile() == self.stream:
             try:
                 self.update()
-                self.set_window_property("Artist", self.track_info["artist"])
-                self.set_window_property("Title", self.track_info["title"])
+                for name, value in self.nowplaying.items():
+                    self.set_window_property(name, value)
             except:
                 pass
             xbmc.sleep(10000)
@@ -102,9 +102,14 @@ class InfoScraper():
 
     def set_window_property(self, name, value):
         name = addon.getAddonInfo("id") + "." + name
-        self.window.setProperty(name, value)
-        if name not in self.window_properties:
-            self.window_properties.append(name)
+        if value is None:
+            self.window.clearProperty(name)
+            if name in self.window_properties:
+                self.window_properties.remove(name)
+        else:            
+            self.window.setProperty(name, value)
+            if name not in self.window_properties:
+                self.window_properties.append(name)
 
     def clear_window_properties(self):
         for name in self.window_properties:
@@ -115,18 +120,25 @@ class InfoScraper():
         if self.api_key is None:
             self.api_key = requests.get("http://dev.rocketchilli.com/keystore/ba7000f9-7ef4-4ace-bca2-f527cdffb393").json()["api-key"]
         # Call last.fm API to request track information
-        request_url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key={}&artist={}&track={}&format=json".format(self.api_key, self.track_info["artist"], self.track_info["title"])
-        info = requests.get(request_url).json()
-        self.track_info["duration"] = info["track"]["duration"]
-        self.track_info["thumb"] = info["track"]["album"]["image"][1]["#text"]
+        request_url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key={}&artist={}&track={}&format=json"
+        try:
+            info = requests.get(request_url.format(self.api_key, requests.utils.quote(self.nowplaying["artist"]), requests.utils.quote(self.nowplaying["title"]))).json()
+            # Check that response contains image URLs
+            if "image" in info["track"].get("album", {}):
+                self.nowplaying["thumb"] = info["track"]["album"]["image"][-1]["#text"]
+            else:
+                self.nowplaying["thumb"] = None
+            self.nowplaying["duration"] = info["track"]["duration"]
+        except:
+            self.nowplaying["thumb"] = self.nowplaying["duration"] = None
 
     # Scrape track info from Tunein website
     def __update_tunein(self):
         html = requests.get(self.properties["url"]).text
         match = re.search(r"<h3 class=\"title\">(.+?) - (.+?)</h3>", html)
         if match is not None:
-            self.track_info["artist"] = unescape(match.group(1))
-            self.track_info["title"] = unescape(match.group(2))
+            self.nowplaying["artist"] = unescape(match.group(1))
+            self.nowplaying["title"] = unescape(match.group(2))
 
 
 # Build a list of radio stations in the Kodi GUI
