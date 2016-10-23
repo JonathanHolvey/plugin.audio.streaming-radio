@@ -49,16 +49,16 @@ class RadioSource():
         # Detect correct bitrate stream to play
         max_bitrate = int(addon.getSetting("bitrate").split(" ")[0])
         bitrates = [bitrate for bitrate in self.streams.keys() if bitrate <= max_bitrate]
-        url = streams[min(self.streams.keys())] if len(bitrates) == 0 else self.streams[max(bitrates)]
+        self.stream_url = streams[min(self.streams.keys())] if len(bitrates) == 0 else self.streams[max(bitrates)]
 
         # Create list item with stream URL and send to Kodi
         li = self.list_item()
-        li.setPath(url)
+        li.setPath(self.stream_url)
         xbmcplugin.setResolvedUrl(handle, True, li)
 
         # Start scraping track info
         if self.scraper is not None:
-            InfoScraper(self, url).run()
+            InfoScraper(self).run()
 
     # Create dictionary of available artwork files to supply to list item
     def __build_art(self):
@@ -72,35 +72,79 @@ class RadioSource():
 
 
 class InfoScraper():
-    def __init__(self, source, stream):
+    def __init__(self, source):
         self.properties = source.scraper
-        self.stream = stream
+        self.stream = source.stream_url
+        self.window = xbmcgui.Window(10000)  # Attach properties to the home window
+        self.window_properties = []
+        self.api_key = None
+        self.nowplaying = {"station": source.name}
+        self.nowplaying_hash = hash(frozenset(self.nowplaying.items()))
 
     def update(self):
         if self.properties["type"] == "tunein":
-            return self.__update_tunein()
+            self.__update_tunein()
+        # Compare now playing dictionary against hash to check for changes
+        if self.nowplaying_hash != hash(frozenset(self.nowplaying.items())):
+            self.get_track_info()
+            # Push track info to skin as window properties
+            for name, value in self.nowplaying.items():
+                self.set_window_property(name, value)
+            self.nowplaying_hash = hash(frozenset(self.nowplaying.items()))
 
     def run(self):
         xbmc.sleep(5000)  # Wait for playback to start
         # Retrieve track information every 10 seconds until playback stops
         while xbmc.Player().isPlayingAudio() and xbmc.Player().getPlayingFile() == self.stream:
             try:
-                artist, title = self.update()
-                xbmcgui.Window(10000).setProperty("streaming-radio.Artist", artist)
-                xbmcgui.Window(10000).setProperty("streaming-radio.Title", title)
+                self.update()
             except:
                 pass
             xbmc.sleep(10000)
+        self.clear_window_properties()  # Remove window properties after playback stops
 
-        # Remove window properties after playback stops
-        clear_window_properties()
+    def set_window_property(self, name, value):
+        name = addon.getAddonInfo("id") + "." + name
+        if value is None:
+            self.window.clearProperty(name)
+            if name in self.window_properties:
+                self.window_properties.remove(name)
+        else:            
+            self.window.setProperty(name, value)
+            if name not in self.window_properties:
+                self.window_properties.append(name)
+
+    def clear_window_properties(self):
+        for name in self.window_properties:
+            self.window.clearProperty(name)
+
+    # Retrieve additional track info from last.fm API
+    def get_track_info(self):
+        if self.api_key is None:
+            self.api_key = requests.get("http://dev.rocketchilli.com/keystore/ba7000f9-7ef4-4ace-bca2-f527cdffb393").json()["api-key"]
+        
+        # Request track information
+        track_url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key={}&artist={}&track={}&format=json"
+        try:
+            track_info = requests.get(track_url.format(self.api_key, requests.utils.quote(self.nowplaying["artist"]), requests.utils.quote(self.nowplaying["title"]))).json()["track"]
+            # Check that response contains image URLs
+            if "image" in track_info["album"]:
+                self.nowplaying["thumb"] = track_info["album"]["image"][-1]["#text"]
+            else:
+                self.nowplaying["thumb"] = None
+            self.nowplaying["duration"] = track_info["duration"]
+            self.nowplaying["album"] = track_info["album"]["title"]
+            self.nowplaying["genre"] = track_info["toptags"]["tag"][0]["name"].capitalize()
+        except:
+            self.nowplaying["thumb"] = self.nowplaying["duration"] = self.nowplaying["album"] = self.nowplaying["genre"] = None
 
     # Scrape track info from Tunein website
     def __update_tunein(self):
         html = requests.get(self.properties["url"]).text
         match = re.search(r"<h3 class=\"title\">(.+?) - (.+?)</h3>", html)
         if match is not None:
-            return unescape(match.group(1)), unescape(match.group(2))
+            self.nowplaying["artist"] = unescape(match.group(1))
+            self.nowplaying["title"] = unescape(match.group(2))
 
 
 # Build a list of radio stations in the Kodi GUI
@@ -114,13 +158,6 @@ def build_list():
         xbmcplugin.addDirectoryItem(handle=handle, url=source.url, listitem=li, isFolder=False)
 
     xbmcplugin.endOfDirectory(handle)
-
-
-def clear_window_properties():
-    properties = ("Artist", "Title")
-    window = xbmcgui.Window(10000)
-    for prop in properties:
-        window.clearProperty("streaming-radio." + prop)
 
 
 def unescape(string):
