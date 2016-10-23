@@ -115,22 +115,25 @@ class InfoScraper():
         for name in self.window_properties:
             self.window.clearProperty(name)
 
-    # Retrieve track information from last.fm API
+    # Retrieve additional track info from last.fm API
     def get_track_info(self):
         if self.api_key is None:
             self.api_key = requests.get("http://dev.rocketchilli.com/keystore/ba7000f9-7ef4-4ace-bca2-f527cdffb393").json()["api-key"]
-        # Call last.fm API to request track information
-        request_url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key={}&artist={}&track={}&format=json"
+        
+        # Request track information
+        track_url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key={}&artist={}&track={}&format=json"
         try:
-            info = requests.get(request_url.format(self.api_key, requests.utils.quote(self.nowplaying["artist"]), requests.utils.quote(self.nowplaying["title"]))).json()
+            track_info = requests.get(track_url.format(self.api_key, requests.utils.quote(self.nowplaying["artist"]), requests.utils.quote(self.nowplaying["title"]))).json()["track"]
             # Check that response contains image URLs
-            if "image" in info["track"].get("album", {}):
-                self.nowplaying["thumb"] = info["track"]["album"]["image"][-1]["#text"]
+            if "image" in track_info["album"]:
+                self.nowplaying["thumb"] = track_info["album"]["image"][-1]["#text"]
             else:
                 self.nowplaying["thumb"] = None
-            self.nowplaying["duration"] = info["track"]["duration"]
+            self.nowplaying["duration"] = track_info["duration"]
+            self.nowplaying["album"] = track_info["album"]["title"]
+            self.nowplaying["genre"] = track_info["toptags"]["tag"][0]["name"].capitalize()
         except:
-            self.nowplaying["thumb"] = self.nowplaying["duration"] = None
+            self.nowplaying["thumb"] = self.nowplaying["duration"] = self.nowplaying["album"] = self.nowplaying["genre"] = None
 
     # Scrape track info from Tunein website
     def __update_tunein(self):
