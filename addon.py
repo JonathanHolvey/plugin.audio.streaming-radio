@@ -126,7 +126,7 @@ class InfoScraper():
         # Request track information
         track_url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key={}&artist={}&track={}&format=json"
         try:
-            track_info = requests.get(track_url.format(self.api_key, requests.utils.quote(self.nowplaying["artist"]), requests.utils.quote(self.nowplaying["title"]))).json()["track"]
+            track_info = requests.get(track_url.format(self.api_key, urlencode(self.nowplaying["artist"]), urlencode(self.nowplaying["title"]))).json()["track"]
             # Check that response contains image URLs
             if "image" in track_info["album"]:
                 self.nowplaying["thumb"] = track_info["album"]["image"][-1]["#text"]
@@ -163,6 +163,10 @@ def build_list():
 def unescape(string):
     html_parser = HTMLParser.HTMLParser()
     return html_parser.unescape(string)
+
+
+def urlencode(string):
+    return requests.utils.quote(string.encode("utf8"))
 
 
 # Request permission from user to modify skin files
