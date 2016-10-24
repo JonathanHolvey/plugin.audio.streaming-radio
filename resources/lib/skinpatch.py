@@ -41,11 +41,12 @@ class SkinPatch():
 
     # Apply patch and reload skin, then revert files
     def sideload(self):
-        property_name = xbmcaddon.Addon().getAddonInfo("id") + ".skinpatch-status"
+        name = xbmcaddon.Addon().getAddonInfo("id") + ".skinpatch-status"
+        value = xbmcaddon.Addon().getAddonInfo("version")  # Force re-patch after addon update
         window = xbmcgui.Window(10000)
-        if window.getProperty(property_name) != "patched":
+        if window.getProperty(name) != value:
             if self.apply():
                 xbmc.executebuiltin("ReloadSkin()")
                 xbmc.sleep(1000)
-                window.setProperty(property_name, "patched")
+                window.setProperty(name, value)
                 self.revert()
