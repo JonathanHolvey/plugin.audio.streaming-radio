@@ -123,20 +123,24 @@ class InfoScraper():
         if self.api_key is None:
             self.api_key = requests.get("http://dev.rocketchilli.com/keystore/ba7000f9-7ef4-4ace-bca2-f527cdffb393").json()["api-key"]
         
+        # Reset track information before updating
+        for key, value in self.nowplaying.items():
+            if key not in ("title", "artist", "station"):
+                self.nowplaying[key] = None
+
         # Request track information
         track_url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key={}&artist={}&track={}&format=json"
-        try:
-            track_info = requests.get(track_url.format(self.api_key, urlencode(self.nowplaying["artist"]), urlencode(self.nowplaying["title"]))).json()["track"]
-            # Check that response contains image URLs
-            if "image" in track_info["album"]:
-                self.nowplaying["thumb"] = track_info["album"]["image"][-1]["#text"]
-            else:
-                self.nowplaying["thumb"] = None
-            self.nowplaying["duration"] = track_info["duration"]
-            self.nowplaying["album"] = track_info["album"]["title"]
-            self.nowplaying["genre"] = track_info["toptags"]["tag"][0]["name"].capitalize()
-        except:
-            self.nowplaying["thumb"] = self.nowplaying["duration"] = self.nowplaying["album"] = self.nowplaying["genre"] = None
+        response = requests.get(track_url.format(self.api_key, urlencode(self.nowplaying["artist"]), urlencode(self.nowplaying["title"])))
+        if response.status_code == requests.codes.ok:
+            track_info = response.json()["track"]
+            if "album" in track_info:
+                self.nowplaying["album"] = track_info["album"]["title"]
+                if "image" in track_info["album"] and len(track_info["album"]["image"]) > 0:
+                    self.nowplaying["thumb"] = track_info["album"]["image"][-1]["#text"]
+            if "duration" in track_info:
+                self.nowplaying["duration"] = track_info["duration"]
+            if "toptags" in track_info and len(track_info["toptags"]["tag"]) > 0:
+                self.nowplaying["genre"] = track_info["toptags"]["tag"][0]["name"].capitalize()
 
     # Scrape track info from Tunein website
     def __update_tunein(self):
