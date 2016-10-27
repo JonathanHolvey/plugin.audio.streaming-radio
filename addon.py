@@ -54,7 +54,7 @@ class RadioSource():
         # Create list item with stream URL and send to Kodi
         li = self.list_item()
         li.setPath(self.stream_url)
-        xbmc.Player().play(item=self.stream_url, listitem=li)
+        RadioPlayer().play_stream(self)
 
         # Start scraping track info
         if self.scraper is not None:
@@ -69,6 +69,14 @@ class RadioSource():
                 if os.path.isfile(path):
                     art[art_type] = path
         return art
+
+
+class RadioPlayer(xbmc.Player):
+    def __init__(self):
+        xbmc.Player.__init__(self)
+
+    def play_stream(self, source):
+        self.play(item=source.stream_url, listitem=source.list_item())
 
 
 class InfoScraper():
