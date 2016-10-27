@@ -54,7 +54,7 @@ class RadioSource():
         # Create list item with stream URL and send to Kodi
         li = self.list_item()
         li.setPath(self.stream_url)
-        xbmcplugin.setResolvedUrl(handle, True, li)
+        xbmc.Player().play(item=self.stream_url, listitem=li)
 
         # Start scraping track info
         if self.scraper is not None:
@@ -158,7 +158,6 @@ def build_list():
     for file in sources:
         source = RadioSource(file)
         li = source.list_item()
-        li.setProperty("IsPlayable", "true")
         xbmcplugin.addDirectoryItem(handle=handle, url=source.url, listitem=li, isFolder=False)
 
     xbmcplugin.endOfDirectory(handle)
