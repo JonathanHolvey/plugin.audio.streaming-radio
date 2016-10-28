@@ -76,48 +76,36 @@ class RadioPlayer(xbmc.Player):
         self.play(item=source.stream_url, listitem=source.list_item())
 
         if source.scraper is not None:
-            info = InfoScraper(source)
+            info = RadioInfo(source)
             start_time = datetime.datetime.today()
             while self.isPlaying() or datetime.datetime.today() <= start_time + datetime.timedelta(seconds=5):
                 info.update()
                 xbmc.sleep(10000)
 
-            info.clear_window_properties()
+            info.cleanup()
 
 
-class InfoScraper():
+class RadioInfo():
     def __init__(self, source):
-        self.properties = source.scraper
+        self.scraper = source.scraper
         self.stream = source.stream_url
         self.window = xbmcgui.Window(10000)  # Attach properties to the home window
         self.window_properties = []
         self.api_key = None
-        self.nowplaying = {"station": source.name}
-        self.nowplaying_hash = hash(frozenset(self.nowplaying.items()))
+        self.info = {"station": source.name}
+        self.info_hash = hash(frozenset(self.info.items()))
 
     def update(self):
-        if self.properties["type"] == "tunein":
-            self.__update_tunein()
+        self.get_now_playing()
         # Compare now playing dictionary against hash to check for changes
-        if self.nowplaying_hash != hash(frozenset(self.nowplaying.items())):
+        if self.info_hash != hash(frozenset(self.info.items())):
             self.get_track_info()
-            # Push track info to skin as window properties
-            for name, value in self.nowplaying.items():
-                self.set_window_property(name, value)
-            self.nowplaying_hash = hash(frozenset(self.nowplaying.items()))
+            for name, value in self.info.items():
+                self.set_info(name, value)
+            self.info_hash = hash(frozenset(self.info.items()))
 
-    def run(self):
-        xbmc.sleep(5000)  # Wait for playback to start
-        # Retrieve track information every 10 seconds until playback stops
-        while xbmc.Player().isPlayingAudio() and xbmc.Player().getPlayingFile() == self.stream:
-            try:
-                self.update()
-            except:
-                pass
-            xbmc.sleep(10000)
-        self.clear_window_properties()  # Remove window properties after playback stops
-
-    def set_window_property(self, name, value):
+    # Push track info to skin as window property
+    def set_info(self, name, value):
         name = addon.getAddonInfo("id") + "." + name
         if value is None:
             self.window.clearProperty(name)
@@ -128,9 +116,13 @@ class InfoScraper():
             if name not in self.window_properties:
                 self.window_properties.append(name)
 
-    def clear_window_properties(self):
+    def cleanup(self):
         for name in self.window_properties:
             self.window.clearProperty(name)
+
+    def get_now_playing(self):
+        if self.scraper["type"] == "tunein":
+            self.__update_tunein()
 
     # Retrieve additional track info from last.fm API
     def get_track_info(self):
@@ -138,31 +130,31 @@ class InfoScraper():
             self.api_key = requests.get("http://dev.rocketchilli.com/keystore/ba7000f9-7ef4-4ace-bca2-f527cdffb393").json()["api-key"]
         
         # Reset track information before updating
-        for key, value in self.nowplaying.items():
+        for key, value in self.info.items():
             if key not in ("title", "artist", "station"):
-                self.nowplaying[key] = None
+                self.info[key] = None
 
         # Request track information
         track_url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key={}&artist={}&track={}&format=json"
-        response = requests.get(track_url.format(self.api_key, urlencode(self.nowplaying["artist"]), urlencode(self.nowplaying["title"])))
+        response = requests.get(track_url.format(self.api_key, urlencode(self.info["artist"]), urlencode(self.info["title"])))
         if response.status_code == requests.codes.ok:
             track_info = response.json()["track"]
             if "album" in track_info:
-                self.nowplaying["album"] = track_info["album"]["title"]
+                self.info["album"] = track_info["album"]["title"]
                 if "image" in track_info["album"] and len(track_info["album"]["image"]) > 0:
-                    self.nowplaying["thumb"] = track_info["album"]["image"][-1]["#text"]
+                    self.info["thumb"] = track_info["album"]["image"][-1]["#text"]
             if "duration" in track_info:
-                self.nowplaying["duration"] = track_info["duration"]
+                self.info["duration"] = track_info["duration"]
             if "toptags" in track_info and len(track_info["toptags"]["tag"]) > 0:
-                self.nowplaying["genre"] = track_info["toptags"]["tag"][0]["name"].capitalize()
+                self.info["genre"] = track_info["toptags"]["tag"][0]["name"].capitalize()
 
     # Scrape track info from Tunein website
     def __update_tunein(self):
-        html = requests.get(self.properties["url"]).text
+        html = requests.get(self.scraper["url"]).text
         match = re.search(r"<h3 class=\"title\">(.+?) - (.+?)</h3>", html)
         if match is not None:
-            self.nowplaying["artist"] = unescape(match.group(1))
-            self.nowplaying["title"] = unescape(match.group(2))
+            self.info["artist"] = unescape(match.group(1))
+            self.info["title"] = unescape(match.group(2))
 
 
 # Build a list of radio stations in the Kodi GUI
