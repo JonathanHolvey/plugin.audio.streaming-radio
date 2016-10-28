@@ -5,7 +5,7 @@ import shutil
 import requests
 import re
 import HTMLParser
-import datetime
+from datetime import datetime, timedelta
 
 import xbmc
 import xbmcgui
@@ -77,12 +77,12 @@ class RadioPlayer(xbmc.Player):
 
         if source.scraper is not None:
             info = RadioInfo(source)
-            start_time = datetime.datetime.today()
-            while self.isPlaying() or datetime.datetime.today() <= start_time + datetime.timedelta(seconds=5):
+            start_time = datetime.today()
+            while self.isPlaying() or datetime.today() <= start_time + timedelta(seconds=5):
                 info.update()
-                xbmc.sleep(10000)
+                xbmc.sleep(1000)
 
-            info.cleanup()
+            info.cleanup()  # Remove window properties on playback stop
 
 
 class RadioInfo():
@@ -91,18 +91,22 @@ class RadioInfo():
         self.stream = source.stream_url
         self.window = xbmcgui.Window(10000)  # Attach properties to the home window
         self.window_properties = []
-        self.api_key = None
+        self.next_update = datetime.today()
         self.info = {"station": source.name}
         self.info_hash = hash(frozenset(self.info.items()))
+        self.api_key = None
 
     def update(self):
-        self.get_now_playing()
-        # Compare now playing dictionary against hash to check for changes
-        if self.info_hash != hash(frozenset(self.info.items())):
-            self.get_track_info()
-            for name, value in self.info.items():
-                self.set_info(name, value)
-            self.info_hash = hash(frozenset(self.info.items()))
+        if self.next_update <= datetime.today():
+            self.get_now_playing()
+            # Compare now playing dictionary against hash to check for changes
+            if self.info_hash != hash(frozenset(self.info.items())):
+                self.get_track_info()
+                for name, value in self.info.items():
+                    self.set_info(name, value)
+                self.info_hash = hash(frozenset(self.info.items()))
+            # Set next update time
+            self.next_update = datetime.today() + timedelta(seconds=10)
 
     # Push track info to skin as window property
     def set_info(self, name, value):
