@@ -5,6 +5,7 @@ import shutil
 import requests
 import re
 import HTMLParser
+import datetime
 
 import xbmc
 import xbmcgui
@@ -56,10 +57,6 @@ class RadioSource():
         li.setPath(self.stream_url)
         RadioPlayer().play_stream(self)
 
-        # Start scraping track info
-        if self.scraper is not None:
-            InfoScraper(self).run()
-
     # Create dictionary of available artwork files to supply to list item
     def __build_art(self):
         art = {}
@@ -77,6 +74,15 @@ class RadioPlayer(xbmc.Player):
 
     def play_stream(self, source):
         self.play(item=source.stream_url, listitem=source.list_item())
+
+        if source.scraper is not None:
+            info = InfoScraper(source)
+            start_time = datetime.datetime.today()
+            while self.isPlaying() or datetime.datetime.today() <= start_time + datetime.timedelta(seconds=5):
+                info.update()
+                xbmc.sleep(10000)
+
+            info.clear_window_properties()
 
 
 class InfoScraper():
