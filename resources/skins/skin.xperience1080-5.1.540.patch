@@ -39,14 +39,14 @@ index c8b627f..b6a0d7d 100644
                                  <font>Font-Condensed-S36</font>
                                  <align>left</align>
 diff --git a/1080i/Includes_Info.xml b/1080i/Includes_Info.xml
-index 577b074..08483f2 100644
+index 577b074..f0bcbff 100644
 --- a/1080i/Includes_Info.xml
 +++ b/1080i/Includes_Info.xml
-@@ -205,16 +205,35 @@
+@@ -205,16 +205,36 @@
      <variable name="NowPlayingTitle">
          <value condition="Player.HasVideo + !Pvr.IsPlayingTv">$INFO[VideoPlayer.Title]</value>
          <value condition="Player.HasVideo + Pvr.IsPlayingTv">$INFO[VideoPlayer.ChannelName,,: ]$INFO[VideoPlayer.Title]</value>
-+        <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Title))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Ttle)]</value>
++        <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Title))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Title)]</value>
          <value>$INFO[MusicPlayer.Title]</value>
      </variable>
  
@@ -71,7 +71,8 @@ index 577b074..08483f2 100644
 +        <value>$INFO[Player.Art(thumb)]</value>
 +    </variable>
 +    <variable name="OSDGenre">
-+        <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Station))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Genre)]$INFO[Window(10000).Property(plugin.audio.streaming-radio.Station), • ,]</value>
++        <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Genre))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Genre)]$INFO[Window(10000).Property(plugin.audio.streaming-radio.Station), • ,]</value>
++        <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Station))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Station)]</value>
 +        <value>$INFO[MusicPlayer.Genre]</value>
 +    </variable>
 +
