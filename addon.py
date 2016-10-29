@@ -94,15 +94,27 @@ class RadioInfo():
 
         self.scraper = source.scraper
         self.info = {"station": source.name}
+        self.first_update = True
         self.next_update = datetime.today()
+        self.delayed = False
 
     def update(self):
         if self.next_update <= datetime.today():
-            if self.get_now_playing():
+            changed = self.get_now_playing()
+            # Get track info if track has changed
+            if changed:
                 self.get_track_info()
+            # Apply delay so OSD update if required
+            if changed and "delay" in self.scraper and not self.delayed and not self.first_update:
+                self.next_update = datetime.today() + timedelta(seconds=int(self.scraper["delay"]))
+                self.delayed = True
+            # Set track info if no delay is required, or if a delay has already been applied
+            elif changed or self.delayed:
                 self.set_info()
-            # Set next update time
-            self.next_update = datetime.today() + timedelta(seconds=10)
+                self.delayed = self.first_update = False
+            # Wait as usual if track has not changed
+            if not self.delayed:
+                self.next_update = datetime.today() + timedelta(seconds=10)
 
     # Push track info to skin the as window properties
     def set_info(self):
