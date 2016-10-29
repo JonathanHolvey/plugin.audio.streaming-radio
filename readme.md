@@ -61,4 +61,8 @@ The `url` can be found by searching for your radio station on the Tunein website
 7. Add support for other skins - pull requests welcome
 8. Show track progress and end time in the OSD
 
+## Licence
+
+This software is distributed under the GNU General Public License v3. Copyright 2016 Jonathan Holvey.
+
 [screenshot]: http://i.imgur.com/ITegNCy.png
