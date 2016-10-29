@@ -8,7 +8,7 @@
 		<provides>audio</provides>
 	</extension>
 	<extension point="xbmc.addon.metadata">
-		<summary lang="en_gb">Listen to custom radio streams with station-specific artwork</summary>
+		<summary lang="en_gb">Listen to custom radio streams with station fanart and on-screen track information</summary>
 		<description lang="en_gb"/>
 		<disclaimer lang="en_gb"/>
 		<language/>
