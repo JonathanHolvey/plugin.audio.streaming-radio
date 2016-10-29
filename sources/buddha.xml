@@ -9,5 +9,6 @@
 	<thumb>buddha-thumb.png</thumb>
 	<scraper type="tunein">
 		<url>http://tunein.com/radio/Buddha-Radio-s172072/</url>
+		<delay>20</delay>
 	</scraper>
 </source>
