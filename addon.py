@@ -78,6 +78,7 @@ class RadioPlayer(xbmc.Player):
         if source.scraper is not None:
             info = RadioInfo(source)
             start_time = datetime.today()
+            # Wait for playback to start, then loop until stopped
             while self.isPlaying() or datetime.today() <= start_time + timedelta(seconds=5):
                 info.update()
                 xbmc.sleep(1000)
@@ -87,52 +88,48 @@ class RadioPlayer(xbmc.Player):
 
 class RadioInfo():
     def __init__(self, source):
-        self.scraper = source.scraper
-        self.stream = source.stream_url
+        self.api_key = requests.get("http://dev.rocketchilli.com/keystore/ba7000f9-7ef4-4ace-bca2-f527cdffb393").json()["api-key"]
         self.window = xbmcgui.Window(10000)  # Attach properties to the home window
         self.window_properties = []
-        self.next_update = datetime.today()
+
+        self.scraper = source.scraper
         self.info = {"station": source.name}
-        self.info_hash = hash(frozenset(self.info.items()))
-        self.api_key = None
+        self.next_update = datetime.today()
 
     def update(self):
         if self.next_update <= datetime.today():
-            self.get_now_playing()
-            # Compare now playing dictionary against hash to check for changes
-            if self.info_hash != hash(frozenset(self.info.items())):
+            if self.get_now_playing():
                 self.get_track_info()
-                for name, value in self.info.items():
-                    self.set_info(name, value)
-                self.info_hash = hash(frozenset(self.info.items()))
+                self.set_info()
             # Set next update time
             self.next_update = datetime.today() + timedelta(seconds=10)
 
-    # Push track info to skin as window property
-    def set_info(self, name, value):
-        name = addon.getAddonInfo("id") + "." + name
-        if value is None:
-            self.window.clearProperty(name)
-            if name in self.window_properties:
-                self.window_properties.remove(name)
-        else:            
-            self.window.setProperty(name, value)
-            if name not in self.window_properties:
-                self.window_properties.append(name)
+    # Push track info to skin the as window properties
+    def set_info(self):
+        for name, value in self.info.items():
+            name = addon.getAddonInfo("id") + "." + name
+            if value is None:
+                self.window.clearProperty(name)
+                if name in self.window_properties:
+                    self.window_properties.remove(name)
+            else:            
+                self.window.setProperty(name, value)
+                if name not in self.window_properties:
+                    self.window_properties.append(name)
 
     def cleanup(self):
         for name in self.window_properties:
             self.window.clearProperty(name)
 
     def get_now_playing(self):
+        track_id = self.id_track()
         if self.scraper["type"] == "tunein":
             self.__update_tunein()
+        # Return True if track info has changed
+        return track_id != self.id_track()
 
     # Retrieve additional track info from last.fm API
     def get_track_info(self):
-        if self.api_key is None:
-            self.api_key = requests.get("http://dev.rocketchilli.com/keystore/ba7000f9-7ef4-4ace-bca2-f527cdffb393").json()["api-key"]
-        
         # Reset track information before updating
         for key, value in self.info.items():
             if key not in ("title", "artist", "station"):
@@ -151,6 +148,9 @@ class RadioInfo():
                 self.info["duration"] = track_info["duration"]
             if "toptags" in track_info and len(track_info["toptags"]["tag"]) > 0:
                 self.info["genre"] = track_info["toptags"]["tag"][0]["name"].capitalize()
+
+    def id_track(self):
+        return self.info.get("title", "") + self.info.get("artist", "")
 
     # Scrape track info from Tunein website
     def __update_tunein(self):
