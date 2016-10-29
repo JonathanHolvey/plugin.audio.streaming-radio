@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.1.1">
+<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.2.0">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
+		<import addon="script.module.requests" version="2.9.1"/>
 	</requires>
 	<extension library="addon.py" point="xbmc.python.pluginsource">
 		<provides>audio</provides>
 	</extension>
 	<extension point="xbmc.addon.metadata">
-		<summary lang="en_gb">Listen to custom radio streams with station-specific artwork</summary>
+		<summary lang="en_gb">Listen to custom radio streams with station fanart and on-screen track information</summary>
 		<description lang="en_gb"/>
 		<disclaimer lang="en_gb"/>
 		<language/>
@@ -18,6 +19,11 @@
 		<email/>
 		<source/>
 		<news>
+			v1.2.0 (2016-10-29)
+			- Split radio sources into separate XML files
+			- Added module for patching skins, to enable the display of track information
+			- Added display of now playing track information from Tunein.com and last.fm
+
 			v1.1.1 (2016-09-18)
 			- Bugfix: Added default value for maximum bitrate setting to prevent error if not set.
 
