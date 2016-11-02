@@ -150,7 +150,7 @@ class RadioInfo():
         # Request track information
         track_url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key={}&artist={}&track={}&format=json"
         response = requests.get(track_url.format(self.api_key, urlencode(self.info["artist"]), urlencode(self.info["title"])))
-        if response.status_code == requests.codes.ok:
+        if response.status_code == requests.codes.ok and "track" in response.json():
             track_info = response.json()["track"]
             if "album" in track_info:
                 self.info["album"] = track_info["album"]["title"]
