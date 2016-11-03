@@ -175,7 +175,6 @@ class RadioInfo():
 
 # Build a list of radio stations in the Kodi GUI
 def build_list():
-    xbmcplugin.setContent(handle, "audio")
     # Loop through sources XML and create list item for each entry
     for file in sources:
         source = RadioSource(file)
