@@ -36,5 +36,8 @@
 			v1.0.0 (2016-09-17)
 			- Initial release.
 		</news>
+		<assets>
+			<icon>resources/icon.png</icon>
+		</assets>
 	</extension>
 </addon>
