@@ -1,7 +1,7 @@
 import os
 import xml.etree.ElementTree as et
 import urlparse
-import shutil
+import sys
 import requests
 import re
 import HTMLParser
@@ -27,8 +27,10 @@ class RadioSource():
 
         # Load source properties from XML
         self.name = xml.find("name").text
-        self.streams = dict((int(stream.get("bitrate", default=0)), stream.text) for stream in xml.findall("stream"))
-        self.info = dict((child.tag, child.text) for child in xml if child.tag not in ("name", "stream", "scraper"))
+        self.streams = dict((int(stream.get("bitrate", default=0)), stream.text)
+                            for stream in xml.findall("stream"))
+        self.info = dict((child.tag, child.text) for child in xml
+                         if child.tag not in ("name", "stream", "scraper"))
         self.url = "{}?source={}".format(plugin_url, file)
 
         # Load scraper properties
@@ -56,7 +58,8 @@ class RadioSource():
         else:
             max_bitrate = int(addon.getSetting("bitrate").split(" ")[0])
             bitrates = [bitrate for bitrate in self.streams.keys() if bitrate <= max_bitrate]
-            self.stream_url = self.streams[min(self.streams.keys())] if len(bitrates) == 0 else self.streams[max(bitrates)]
+            self.stream_url = (self.streams[min(self.streams.keys())]
+                               if len(bitrates) == 0 else self.streams[max(bitrates)])
 
         # Create list item with stream URL and send to Kodi
         li = self.list_item()
@@ -66,7 +69,8 @@ class RadioSource():
     # Create dictionary of available artwork files to supply to list item
     def __build_art(self):
         art = {}
-        for art_type in ("thumb", "fanart", "poster", "banner", "clearart", "clearlogo", "landscape", "icon"):
+        for art_type in ("thumb", "fanart", "poster", "banner",
+                         "clearart", "clearlogo", "landscape", "icon"):
             if self.info.get(art_type, None) is not None:
                 path = os.path.join(addon.getAddonInfo("path"), "artwork", self.info[art_type])
                 if os.path.isfile(path):
@@ -94,7 +98,9 @@ class RadioPlayer(xbmc.Player):
 
 class RadioInfo():
     def __init__(self, source):
-        self.api_key = requests.get("http://dev.rocketchilli.com/keystore/ba7000f9-7ef4-4ace-bca2-f527cdffb393").json()["api-key"]
+        self.api_key = requests.get("http://dev.rocketchilli.com/"
+                                    "keystore/ba7000f9-7ef4-4ace-b"
+                                    "ca2-f527cdffb393").json()["api-key"]
         self.window = xbmcgui.Window(10000)  # Attach properties to the home window
         self.window_properties = []
 
@@ -130,7 +136,7 @@ class RadioInfo():
                 self.window.clearProperty(name)
                 if name in self.window_properties:
                     self.window_properties.remove(name)
-            else:            
+            else:
                 self.window.setProperty(name, value)
                 if name not in self.window_properties:
                     self.window_properties.append(name)
@@ -154,8 +160,10 @@ class RadioInfo():
                 self.info[key] = None
 
         # Request track information
-        track_url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key={}&artist={}&track={}&format=json"
-        response = requests.get(track_url.format(self.api_key, urlencode(self.info["artist"]), urlencode(self.info["title"])))
+        track_url = ("http://ws.audioscrobbler.com/2.0/?method=track.getInfo"
+                     "&api_key={}&artist={}&track={}&format=json")
+        response = requests.get(track_url.format(self.api_key, urlencode(self.info["artist"]),
+                                                 urlencode(self.info["title"])))
         if response.status_code == requests.codes.ok and "track" in response.json():
             track_info = response.json()["track"]
             if "album" in track_info:
@@ -209,8 +217,9 @@ def urlencode(string):
 # Request permission from user to modify skin files
 def prompt_skinpatch():
     if addon.getSetting("skin-patch-prompt") == "true":
-        if xbmcgui.Dialog().yesno(heading=addon.getAddonInfo("name"), line1=addon.getLocalizedString(30003),
-                line2=addon.getLocalizedString(30004)):
+        if xbmcgui.Dialog().yesno(heading=addon.getAddonInfo("name"),
+                                  line1=addon.getLocalizedString(30003),
+                                  line2=addon.getLocalizedString(30004)):
             addon.setSetting("skin-patch", "true")
         addon.setSetting("skin-patch-prompt", "false")
     # Patch skin to allow track info to be displayed
@@ -219,7 +228,8 @@ def prompt_skinpatch():
 
 
 # Extract URL parameters
-params = dict((key, value_list[0]) for key, value_list in urlparse.parse_qs(sys.argv[2][1:]).items())
+params = dict((key, value_list[0]) for key, value_list
+              in urlparse.parse_qs(sys.argv[2][1:]).items())
 
 # Load source filenames into list
 sources = []
