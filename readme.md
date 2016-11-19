@@ -17,6 +17,7 @@ Radio streams can be added to the addon by specifying them in XML files in the `
 	<name>Buddha Radio</name>
 	<tagline>Tune in, chill out</tagline>
 	<description>Chill Out Digital Radio - Buddha Radio has a very simple philosophy...</description>
+	<genre>Chillout</genre>
 	<fanart>buddha-fanart.jpg</fanart>
 	<thumb>buddha-thumb.png</thumb>
 </source>
@@ -49,6 +50,19 @@ A track info scraper can be defined for a radio station by supplying a `<scraper
 ```
 
 The `url` can be found by searching for your radio station on the Tunein website and copying the URL from your browser's address bar. If the track info is displayed on the Tunein website, then it should be scraped into Kodi successfully. The `delay` property is optional, and allows you to sync the track info change with the audio, in the case where the scraper source changes first. The delay is specified in seconds.
+
+## Sorting
+
+By default, radio stations are sorted alphabetically by the station name. This behaviour can be modified by providing a `<sort>` node in the source XML file, which will be used to assist the default sorting. Lower `sort` values will be placed toward the top of the list. Stations which share the same `sort` value (including those with no value at all) will also be sorted alphabetically within the list. The `sort` property should be provided as a decimal number, eg `1` or `1.2`.
+
+```xml
+<source>
+	...
+	<sort>1</sort>
+</source>
+```
+
+Stations can also be sorted by name only (ignoring `sort`) and by genre, using the options available in the Kodi GUI.
 
 ### To do:
 
