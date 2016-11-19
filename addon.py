@@ -48,9 +48,12 @@ class RadioSource():
     # Start playing the radio source
     def play(self):
         # Detect correct bitrate stream to play
-        max_bitrate = int(addon.getSetting("bitrate").split(" ")[0])
-        bitrates = [bitrate for bitrate in self.streams.keys() if bitrate <= max_bitrate]
-        self.stream_url = streams[min(self.streams.keys())] if len(bitrates) == 0 else self.streams[max(bitrates)]
+        if addon.getSetting("bitrate") == "Maximum":
+            self.stream_url = self.streams[max(self.streams.keys())]
+        else:
+            max_bitrate = int(addon.getSetting("bitrate").split(" ")[0])
+            bitrates = [bitrate for bitrate in self.streams.keys() if bitrate <= max_bitrate]
+            self.stream_url = self.streams[min(self.streams.keys())] if len(bitrates) == 0 else self.streams[max(bitrates)]
 
         # Create list item with stream URL and send to Kodi
         li = self.list_item()
