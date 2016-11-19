@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.2.2">
+<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.3.0">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.requests" version="2.9.1"/>
@@ -19,6 +19,10 @@
 		<email/>
 		<source/>
 		<news>
+			v1.3.0 (2016-11-19)
+			- Added sorting methods and improved default sorting
+			- Removed unintentional maximum bitrate restriction
+
 			v1.2.2 (2016-11-07)
 			- Added support for Kodi 17
 			- Bug fixes
@@ -32,13 +36,13 @@
 			- Added display of now playing track information from Tunein.com and last.fm
 
 			v1.1.1 (2016-09-18)
-			- Bugfix: Added default value for maximum bitrate setting to prevent error if not set.
+			- Bugfix: Added default value for maximum bitrate setting to prevent error if not set
 
 			v1.1.0 (2016.09.17)
-			- Prevented users' customisations in sources.xml from being overwritten by updates.
+			- Prevented users' customisations in sources.xml from being overwritten by updates
 
 			v1.0.0 (2016-09-17)
-			- Initial release.
+			- Initial release
 		</news>
 		<assets>
 			<icon>resources/icon.png</icon>
