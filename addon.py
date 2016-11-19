@@ -41,16 +41,22 @@ class RadioSource():
     # Generate a Kodi list item from the radio source
     def list_item(self):
         li = xbmcgui.ListItem(self.name, iconImage="DefaultAudio.png")
-        li.setInfo("music", {"title": self.name, "artist": self.info.get("tagline", None)})
+        li.setInfo("music", {"title": self.name,
+                             "artist": self.info.get("tagline", None),
+                             "genre": self.info.get("genre", None)
+                             })
         li.setArt(self.__build_art())
         return li
 
     # Start playing the radio source
     def play(self):
         # Detect correct bitrate stream to play
-        max_bitrate = int(addon.getSetting("bitrate").split(" ")[0])
-        bitrates = [bitrate for bitrate in self.streams.keys() if bitrate <= max_bitrate]
-        self.stream_url = streams[min(self.streams.keys())] if len(bitrates) == 0 else self.streams[max(bitrates)]
+        if addon.getSetting("bitrate") == "Maximum":
+            self.stream_url = self.streams[max(self.streams.keys())]
+        else:
+            max_bitrate = int(addon.getSetting("bitrate").split(" ")[0])
+            bitrates = [bitrate for bitrate in self.streams.keys() if bitrate <= max_bitrate]
+            self.stream_url = self.streams[min(self.streams.keys())] if len(bitrates) == 0 else self.streams[max(bitrates)]
 
         # Create list item with stream URL and send to Kodi
         li = self.list_item()
@@ -175,12 +181,19 @@ class RadioInfo():
 
 # Build a list of radio stations in the Kodi GUI
 def build_list():
-    # Loop through sources XML and create list item for each entry
-    for file in sources:
-        source = RadioSource(file)
+    source_list = [RadioSource(file) for file in sources]
+    # Sort sources by XML <sort> property and then name
+    source_list = sorted(source_list, key=lambda s: s.name)
+    source_list = sorted(source_list, key=lambda s: float(s.info.get("sort", "Inf")))
+
+    # Create list item for each source XML entry
+    for source in source_list:
         li = source.list_item()
         xbmcplugin.addDirectoryItem(handle=handle, url=source.url, listitem=li, isFolder=False)
 
+    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_UNSORTED)
+    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_TITLE)
+    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_GENRE)
     xbmcplugin.endOfDirectory(handle)
 
 
