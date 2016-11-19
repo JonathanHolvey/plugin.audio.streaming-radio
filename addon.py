@@ -162,29 +162,35 @@ class RadioInfo():
         # Request track information
         track_url = ("http://ws.audioscrobbler.com/2.0/?method=track.getInfo"
                      "&api_key={}&artist={}&track={}&format=json")
-        response = requests.get(track_url.format(self.api_key, urlencode(self.info["artist"]),
-                                                 urlencode(self.info["title"])))
-        if response.status_code == requests.codes.ok and "track" in response.json():
-            track_info = response.json()["track"]
-            if "album" in track_info:
-                self.info["album"] = track_info["album"]["title"]
-                if "image" in track_info["album"] and len(track_info["album"]["image"]) > 0:
-                    self.info["thumb"] = track_info["album"]["image"][-1]["#text"]
-            if "duration" in track_info:
-                self.info["duration"] = track_info["duration"]
-            if "toptags" in track_info and len(track_info["toptags"]["tag"]) > 0:
-                self.info["genre"] = track_info["toptags"]["tag"][0]["name"].capitalize()
+        try:
+            response = requests.get(track_url.format(self.api_key, urlencode(self.info["artist"]),
+                                                     urlencode(self.info["title"])))
+            if response.status_code == requests.codes.ok and "track" in response.json():
+                track_info = response.json()["track"]
+                if "album" in track_info:
+                    self.info["album"] = track_info["album"]["title"]
+                    if "image" in track_info["album"] and len(track_info["album"]["image"]) > 0:
+                        self.info["thumb"] = track_info["album"]["image"][-1]["#text"]
+                if "duration" in track_info:
+                    self.info["duration"] = track_info["duration"]
+                if "toptags" in track_info and len(track_info["toptags"]["tag"]) > 0:
+                    self.info["genre"] = track_info["toptags"]["tag"][0]["name"].capitalize()
+        except requests.exceptions.ConnectionError:
+            pass
 
     def id_track(self):
         return self.info.get("title", "") + self.info.get("artist", "")
 
     # Scrape track info from Tunein website
     def __update_tunein(self):
-        html = requests.get(self.scraper["url"]).text
-        match = re.search(r"<h3 class=\"title\">(.+?) - (.+?)</h3>", html)
-        if match is not None:
-            self.info["artist"] = unescape(match.group(1))
-            self.info["title"] = unescape(match.group(2))
+        try:
+            html = requests.get(self.scraper["url"]).text
+            match = re.search(r"<h3 class=\"title\">(.+?) - (.+?)</h3>", html)
+            if match is not None:
+                self.info["artist"] = unescape(match.group(1))
+                self.info["title"] = unescape(match.group(2))
+        except requests.exceptions.ConnectionError:
+            pass
 
 
 # Build a list of radio stations in the Kodi GUI
