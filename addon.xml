@@ -45,7 +45,7 @@
 			- Initial release
 		</news>
 		<assets>
-			<icon>resources/icon.png</icon>
+			<icon>resources/media/icon.png</icon>
 		</assets>
 	</extension>
 </addon>
