@@ -48,4 +48,9 @@
 			<icon>resources/media/icon.png</icon>
 		</assets>
 	</extension>
+	<extension point="xbmc.addon.repository">
+		<info>http://dev.rocketchilli.com/kodi-repo/addons.xml</info>
+		<checksum>http://dev.rocketchilli.com/kodi-repo/addons.xml.md5</checksum>
+		<datadir zip="true">http://dev.rocketchilli.com/kodi-repo/addons</datadir>
+	</extension>
 </addon>
