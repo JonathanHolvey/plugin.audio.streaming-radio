@@ -4,5 +4,6 @@
 		<setting id="bitrate" label="30001" type="labelenum" values="Maximum|128 kb/s|64 kb/s|32 kb/s" default="Maximum"/>
 		<setting id="skin-patch" label="30002" type="bool" default="false"/>
 		<setting id="skin-patch-prompt" visible="false" type="bool" default="true"/>
+		<setting id="skin-patch-remove" label="30005" type="action" action="RunScript(plugin.audio.streaming-radio, 0, ?action=unpatch)"/>
 	</category>
 </settings>

@@ -33,7 +33,7 @@ Artwork images for the radio station should be placed inside the `artwork` folde
 
 The Streaming Radio addon allows the scraping of now playing track infomation from the [Tunein website](http://tunein.com).
 
-Since there is no standard way of pushing track info to the Kodi OSD, the skin is modified automatically to allow the information to be displayed. This is achieved through a patch file which is shipped with the addon, and applied to the skin before starting playback. The skin is refreshed, and the patch is removed, leaving the skin files intact.
+Since there is no standard way of pushing track info to the Kodi OSD, the skin is modified automatically to allow the information to be displayed. This is achieved through a patch file which is shipped with the addon, and applied to the skin the first time playback is started.
 
 *Note that Xperience1080 is the only skin that currently supports displaying track information.*
 

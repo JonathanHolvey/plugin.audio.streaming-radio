@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.3.0">
+<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.4.0">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.requests" version="2.9.1"/>
@@ -19,6 +19,11 @@
 		<email/>
 		<source/>
 		<news>
+			v1.4.0 (2016-12-29)
+			- Changed skin patching so that modifications aren't removed after playback stops
+			- Enabled auto-updating using embedded repository extension point
+			- Bug fixes and tidy-up
+
 			v1.3.0 (2016-11-19)
 			- Added sorting methods and improved default sorting
 			- Removed unintentional maximum bitrate restriction
@@ -45,7 +50,12 @@
 			- Initial release
 		</news>
 		<assets>
-			<icon>resources/icon.png</icon>
+			<icon>resources/media/icon.png</icon>
 		</assets>
+	</extension>
+	<extension point="xbmc.addon.repository">
+		<info>http://dev.rocketchilli.com/kodi-repo/addons.xml</info>
+		<checksum>http://dev.rocketchilli.com/kodi-repo/addons.xml.md5</checksum>
+		<datadir zip="true">http://dev.rocketchilli.com/kodi-repo/addons</datadir>
 	</extension>
 </addon>
