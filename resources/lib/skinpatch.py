@@ -1,10 +1,20 @@
 import os
 import xml.etree.ElementTree as et
+import shutil
 
 import xbmc
 import xbmcgui
 import xbmcaddon
 import patch
+
+
+STATUS_CLEAN = 0
+STATUS_PATCHED = 1
+STATUS_UPDATED = 2  # The addon has been updated since patching
+
+data_path = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo("profile"))
+property_name = xbmcaddon.Addon().getAddonInfo("id") + ".skinpatch-status"
+window = xbmcgui.Window(10000)
 
 
 class SkinPatch():
@@ -21,87 +31,106 @@ class SkinPatch():
                 self.patches.append(os.path.join(patch_path, patch_file))
         self.patches.sort(reverse=True)
         self.get_status()
-        self.save_status()
 
     # Apply the patch using python-patch https://github.com/techtonik/python-patch
     def apply(self):
+        if self.status != STATUS_CLEAN:
+            return False
         for patch_file in self.patches:
             patchset = patch.fromfile(patch_file)
             if patchset.apply(root=self.skin_path):
-                self.applied_patch = patch_file
+                # Set patch status
+                self.status = STATUS_PATCHED
+                self.patch = os.path.join(data_path, "skins", os.path.basename(patch_file))
+                self.files = [(os.path.join(self.skin_path, item.target),
+                              hash_file(os.path.join(self.skin_path, item.target)))
+                              for item in patchset.items]
+                self.version = xbmcaddon.Addon().getAddonInfo("version")
+                self.save_status()
+                # Copy patch file to allow removal later
+                if not os.path.isdir(os.path.dirname(self.patch)):
+                    os.makedirs(os.path.dirname(self.patch))
+                shutil.copy(patch_file, self.patch)
                 return True
-        return False
 
     # Remove the patch using python-patch
     def revert(self):
-        if self.applied_patch is not None:
-            patchset = patch.fromfile(self.applied_patch)
-            if patchset.revert(root=self.skin_path):
-                self.applied_patch = None
-                return True
-        return False
+        if self.status == STATUS_CLEAN:
+            return False
+        patchset = patch.fromfile(self.patch)
+        if patchset.revert(root=self.skin_path):
+            self.status = STATUS_CLEAN
+            self.save_status()
+            os.remove(self.patch)
+            return True
 
-    # Apply patch and reload skin, then revert files
-    def sideload(self):
-        name = xbmcaddon.Addon().getAddonInfo("id") + ".skinpatch-status"
-        value = xbmcaddon.Addon().getAddonInfo("version")  # Force re-patch after addon update
-        window = xbmcgui.Window(10000)
-        if window.getProperty(name) != value:
+    # Apply patch if required and re-apply if patch file changes
+    def autopatch(self):
+        if self.status == STATUS_UPDATED:
+            self.revert()
+        if self.status == STATUS_CLEAN:
             if self.apply():
                 xbmc.executebuiltin("ReloadSkin()")
                 xbmc.sleep(1000)
-                window.setProperty(name, value)
-                self.revert()
+            else:
+                return
+        window.setProperty(property_name, self.version)
 
     # Load and verify skin patch info
     def get_status(self):
-        self.patched = False
-        self.version = None
+        self.status = None
         self.patch = None
-        self.files = []
+        self.files = None
+        self.version = None
 
-        # Retrieve last-patch information from XML file
-        xml_path = os.path.join(xbmcaddon.Addon().getAddonInfo("profile"), "skinpatch.xml")
-        if os.path.isfile(xml_path):
-            xml = et.parse(xml_path).getroot().find("skin[@id='{}']".format(self.skin_id))
-            if xml is not None:
-                self.files = [(file.text, file.attrib["check"]) for file in xml.findall("file")]
-                self.patch = xml.find("patch").text, xml.find("patch").attrib["check"]
-                self.version = xml.attrib["version"]
+        # Check if status has already been verified this session
+        # If the addon or skin are updated, the property value won't match
+        version = xbmcaddon.Addon().getAddonInfo("version")
+        if window.getProperty(property_name) == version:
+            self.status = STATUS_PATCHED
+        else:
+            self.status = STATUS_CLEAN
+            # Retrieve last-patch information from XML file
+            xml_path = os.path.join(data_path, "skinpatch.xml")
+            if os.path.isfile(xml_path):
+                xml = et.parse(xml_path).getroot().find("skin[@id='{}']".format(self.skin_id))
+                if xml is not None:
+                    self.files = [(file.text, file.attrib["check"]) for file in xml.findall("file")]
+                    self.patch = xml.find("patch").text
+                    self.version = xml.find("patch").attrib["version"]
 
-        # Check if status has been vefied already this session
-        name = xbmcaddon.Addon().getAddonInfo("id") + ".skinpatch-status"
-        window = xbmcgui.Window(10000)
-        if window.getProperty(name) == xbmcaddon.Addon().getAddonInfo("version"):
-            self.patched = True
-        # Verify patch integrity by checking all modified files
-        elif len(self.files) > 0:
-            for path, check in self.files:
-                if hash_file(path) != check:
-                    break
-            else:
-                self.patched = True
-                window.setProperty(name, self.version)
+                    # Check if addon has been updated since patching
+                    if self.version != version:
+                        self.status = STATUS_UPDATED
+                    else:
+                        # Verify patch integrity by checking all modified files
+                        for path, check in self.files:
+                            if hash_file(path) != check:
+                                break
+                        else:
+                            self.status = STATUS_PATCHED
 
     # Save skin patch status to XML file
     def save_status(self):
-        xml_path = os.path.join(xbmcaddon.Addon().getAddonInfo("profile"), "skinpatch.xml")
+        xml_path = os.path.join(data_path, "skinpatch.xml")
         if os.path.isfile(xml_path):
             xml = et.parse(xml_path).getroot()
-            xml.remove(xml.find("skin[@id='{}']".format(self.skin_id)))
+            old = xml.find("skin[@id='{}']".format(self.skin_id))
+            if old is not None:
+                xml.remove(old)
         else:
-            xml = et.fromstring("<skinpatch/>")
-        if self.patched:
-            skin = et.Element("skin", attrib={"id": self.skin_id, "version": self.version})
-            patch = et.Element("patch", attrib={"check": self.patch[1]})
-            patch.text = self.patch[0]
+            xml = et.Element("skinpatch")
+        if self.status != STATUS_CLEAN:
+            skin = et.Element("skin", attrib={"id": self.skin_id})
+            patch = et.Element("patch", attrib={"version": self.version})
+            patch.text = self.patch
             skin.append(patch)
             for path, check in self.files:
                 file = et.Element("file", attrib={"check": check})
                 file.text = path
                 skin.append(file)
             xml.append(skin)
-        xml.write(xml_path, encoding="utf-8")
+        et.ElementTree(xml).write(xml_path, encoding="utf-8")
 
 
 def hash_file(path):

@@ -230,7 +230,7 @@ def prompt_skinpatch():
         addon.setSetting("skin-patch-prompt", "false")
     # Patch skin to allow track info to be displayed
     if addon.getSetting("skin-patch") == "true":
-        SkinPatch().sideload()
+        SkinPatch().autopatch()
 
 
 # Extract URL parameters
