@@ -22,13 +22,17 @@ msgid "Maximum bitrate"
 msgstr ""
 
 msgctxt "#30002"
-msgid "Display track info by temporarily modifying the skin"
+msgid "Display track information by modifying the skin"
 msgstr ""
 
 msgctxt "#30003"
-msgid "Track information can be displayed by temporarily modifying the skin."
+msgid "Track information can be displayed by modifying the skin."
 msgstr ""
 
 msgctxt "#30004"
 msgid "Would you like to allow this?"
+msgstr ""
+
+msgctxt "#30005"
+msgid "Remove all skin modifications"
 msgstr ""
