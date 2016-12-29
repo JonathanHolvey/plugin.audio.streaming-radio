@@ -35,32 +35,33 @@ class SkinPatch():
     def apply(self):
         if self.status != STATUS_CLEAN:
             return False
-        for patch_file in self.patches:
-            patchset = patch.fromfile(patch_file)
+        for patch_path in self.patches:
+            patchset = patch.fromfile(patch_path)
             if patchset.apply(root=self.skin_path):
                 # Set patch status
                 self.status = STATUS_PATCHED
-                self.patch = os.path.join(data_path, "skins", os.path.basename(patch_file))
-                self.files = [(os.path.join(self.skin_path, item.target),
-                              hash_file(os.path.join(self.skin_path, item.target)))
+                self.patch = os.path.basename(patch_path)
+                self.files = [(item.target, hash_file(os.path.join(self.skin_path, item.target)))
                               for item in patchset.items]
                 self.version = xbmcaddon.Addon().getAddonInfo("version")
                 self.save_status()
                 # Copy patch file to allow removal later
-                if not os.path.isdir(os.path.dirname(self.patch)):
-                    os.makedirs(os.path.dirname(self.patch))
-                shutil.copy(patch_file, self.patch)
+                copy_path = os.path.join(data_path, "skins", self.patch)
+                if not os.path.isdir(os.path.dirname(copy_path)):
+                    os.makedirs(os.path.dirname(copy_path))
+                shutil.copy(patch_path, copy_path)
                 return True
 
     # Remove the patch using python-patch
     def revert(self):
         if self.status == STATUS_CLEAN:
             return False
-        patchset = patch.fromfile(self.patch)
+        patch_path = os.path.join(data_path, "skins", self.patch)
+        patchset = patch.fromfile(patch_path)
         if patchset.revert(root=self.skin_path):
             self.status = STATUS_CLEAN
             self.save_status()
-            os.remove(self.patch)
+            os.remove(patch_path)
             window.clearProperty(property_name)
             return True
 
@@ -104,7 +105,7 @@ class SkinPatch():
             else:
                 # Verify patch integrity by checking all modified files
                 for path, check in self.files:
-                    if hash_file(path) != check:
+                    if hash_file(os.path.join(self.skin_path, path)) != check:
                         break
                 else:
                     self.status = STATUS_PATCHED
