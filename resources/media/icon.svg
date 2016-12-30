@@ -15,9 +15,9 @@
    viewBox="0 0 99.999997 99.999997"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="Streaming Radio Icon.svg"
-   inkscape:export-filename="C:\Users\Jon\desktop\icon.png"
+   inkscape:version="0.92pre3 15195"
+   sodipodi:docname="icon.svg"
+   inkscape:export-filename="C:\Users\Jon\OneDrive\Projects\Kodi Addons\plugin.audio.streaming-radio\resources\media\icon.png"
    inkscape:export-xdpi="230.39999"
    inkscape:export-ydpi="230.39999">
   <defs
@@ -29,9 +29,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6568543"
-     inkscape:cx="54.872264"
-     inkscape:cy="52.652653"
+     inkscape:zoom="4"
+     inkscape:cx="68.298707"
+     inkscape:cy="81.428744"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -57,7 +57,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -74,24 +74,25 @@
        x="105.35891"
        y="367.48389" />
     <g
-       id="g4223"
-       transform="translate(-44.267112,-28.480393)">
+       id="g4493"
+       transform="translate(5.1719196,-0.25499928)">
       <path
-         sodipodi:nodetypes="cssc"
+         sodipodi:nodetypes="csc"
          inkscape:connector-curvature="0"
          id="rect4147"
-         d="m 175.89258,447.5332 c 0,10.2831 8.2794,18.5625 18.5625,18.5625 10.2831,0 18.56054,-8.2794 18.56054,-18.5625 l 0,-8.96456"
+         d="m 131.62547,419.05281 c 0,10.2831 8.2794,18.5625 18.5625,18.5625 10.2831,0 18.56054,-8.2794 18.56054,-18.5625"
          style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#6699ff;stroke-width:8;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
       <path
          inkscape:connector-curvature="0"
          id="path4159"
-         d="m 194.4541,467.48388 0,16.28871"
+         d="M 150.18699,439.00349 V 455.2922"
          style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#6699ff;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
       <g
+         transform="translate(-44.267112,-28.480393)"
          id="g4181">
         <path
            style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#99cc33;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:9;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-           d="m 182.72168,434.95117 0,12.9043 c 0,6.16135 4.95974,11.12305 11.1211,11.12305 l 1.2207,0 c 6.16135,0 11.12304,-4.9617 11.12304,-11.12305 l 0,-12.9043 z"
+           d="m 182.72168,434.95117 v 12.9043 c 0,6.16135 4.95974,11.12305 11.1211,11.12305 h 1.2207 c 6.16135,0 11.12304,-4.9617 11.12304,-11.12305 v -12.9043 z"
            id="rect4154"
            inkscape:connector-curvature="0"
            sodipodi:nodetypes="csssscc" />
@@ -104,19 +105,11 @@
            width="100%"
            height="100%" />
       </g>
-      <circle
-         r="11.316415"
-         cy="438.41183"
-         cx="224.33203"
-         id="path4192"
-         style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#6699ff;stroke-width:7.99999952;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
-      <rect
-         y="475.77258"
-         x="198.4541"
-         height="8"
-         width="8"
-         id="rect4215"
-         style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#99cc33;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
+      <path
+         style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#6699ff;stroke-width:7.03125;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+         d="M 161.84697,452.28657 H 138.52702"
+         id="path4485"
+         inkscape:connector-curvature="0" />
     </g>
   </g>
 </svg>
