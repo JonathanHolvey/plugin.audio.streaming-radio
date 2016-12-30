@@ -172,7 +172,7 @@ class RadioInfo():
                     if "image" in track_info["album"] and len(track_info["album"]["image"]) > 0:
                         self.info["thumb"] = track_info["album"]["image"][-1]["#text"]
                 if "duration" in track_info:
-                    self.info["duration"] = track_info["duration"]
+                    self.duration = int(track_info["duration"])
                 if "toptags" in track_info and len(track_info["toptags"]["tag"]) > 0:
                     self.info["genre"] = track_info["toptags"]["tag"][0]["name"].capitalize()
         except requests.exceptions.ConnectionError:
