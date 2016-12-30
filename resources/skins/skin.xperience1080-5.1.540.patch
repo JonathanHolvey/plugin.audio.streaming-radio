@@ -63,7 +63,7 @@ index 577b074..f0bcbff 100644
 +        <value>$INFO[MusicPlayer.PlaylistPosition,,. ]$INFO[MusicPlayer.Title]</value>
 +    </variable>
 +    <variable name="OSDSubTitle">
-+        <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Artist))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Artist)]$INFO[Window(10000).Property(plugin.audio.streaming-radio.Album), • ,]</value>
++        <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Artist))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Artist)]$INFO[Window(10000).Property(plugin.audio.streaming-radio.Album), • ,]$INFO[Window(10000).Property(plugin.audio.streaming-radio.Year), • ,]</value>
 +        <value>$INFO[MusicPlayer.Artist]$INFO[MusicPlayer.Album, • ,]$INFO[MusicPlayer.Year, • ,]</value>
 +    </variable>
 +    <variable name="OSDThumbnail">
