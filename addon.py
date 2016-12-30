@@ -47,7 +47,7 @@ class RadioSource():
                              "artist": self.info.get("tagline", None),
                              "genre": self.info.get("genre", None)
                              })
-        li.setArt(self.__build_art())
+        li.setArt(self._build_art())
         return li
 
     # Start playing the radio source
@@ -67,7 +67,7 @@ class RadioSource():
         RadioPlayer().play_stream(self)
 
     # Create dictionary of available artwork files to supply to list item
-    def __build_art(self):
+    def _build_art(self):
         art = {}
         for art_type in ("thumb", "fanart", "poster", "banner",
                          "clearart", "clearlogo", "landscape", "icon"):
@@ -148,7 +148,7 @@ class RadioInfo():
     def get_now_playing(self):
         track_id = self.id_track()
         if self.scraper["type"] == "tunein":
-            self.__update_tunein()
+            self._update_tunein()
         # Return True if track info has changed
         return track_id != self.id_track()
 
@@ -182,7 +182,7 @@ class RadioInfo():
         return self.info.get("title", "") + self.info.get("artist", "")
 
     # Scrape track info from Tunein website
-    def __update_tunein(self):
+    def _update_tunein(self):
         try:
             html = requests.get(self.scraper["url"]).text
             match = re.search(r"<h3 class=\"title\">(.+?) - (.+?)</h3>", html)
