@@ -31,7 +31,7 @@ class RadioSource():
                             for stream in xml.findall("stream"))
         self.info = dict((child.tag, child.text) for child in xml
                          if child.tag not in ("name", "stream", "scraper"))
-        self.url = "{}?source={}".format(plugin_url, file)
+        self.url = "{0}?source={1}".format(plugin_url, file)
 
         # Load scraper properties
         if xml.find("scraper") is not None:
@@ -161,7 +161,7 @@ class RadioInfo():
 
         # Request track information
         track_url = ("http://ws.audioscrobbler.com/2.0/?method=track.getInfo"
-                     "&api_key={}&artist={}&track={}&format=json")
+                     "&api_key={0}&artist={1}&track={2}&format=json")
         try:
             response = requests.get(track_url.format(self.api_key, urlencode(self.info["artist"]),
                                                      urlencode(self.info["title"])))
