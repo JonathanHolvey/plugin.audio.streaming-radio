@@ -87,7 +87,7 @@ class SkinPatch():
         # Retrieve last-patch information from XML file
         xml_path = os.path.join(data_path, "skinpatch.xml")
         if os.path.isfile(xml_path):
-            xml = et.parse(xml_path).getroot().find("skin[@id='{}']".format(self.skin_id))
+            xml = et.parse(xml_path).getroot().find("skin[@id='{0}']".format(self.skin_id))
             if xml is not None:
                 self.files = [(file.text, file.attrib["check"]) for file in xml.findall("file")]
                 self.patch = xml.find("patch").text
@@ -115,7 +115,7 @@ class SkinPatch():
         xml_path = os.path.join(data_path, "skinpatch.xml")
         if os.path.isfile(xml_path):
             xml = et.parse(xml_path).getroot()
-            old = xml.find("skin[@id='{}']".format(self.skin_id))
+            old = xml.find("skin[@id='{0}']".format(self.skin_id))
             if old is not None:
                 xml.remove(old)
         else:
