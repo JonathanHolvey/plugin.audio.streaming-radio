@@ -1,5 +1,5 @@
 diff --git a/1080i/DialogSeekBar.xml b/1080i/DialogSeekBar.xml
-index c8b627f..b6a0d7d 100644
+index c8b627f..d7dff0f 100644
 --- a/1080i/DialogSeekBar.xml
 +++ b/1080i/DialogSeekBar.xml
 @@ -275,7 +275,7 @@
@@ -7,7 +7,7 @@ index c8b627f..b6a0d7d 100644
                                  <width>276</width>
                                  <height>276</height>
 -                                <texture background="true" fallback="views/fallbacks/DefaultAudio.png/square-small.png">$INFO[Player.Art(thumb)]</texture>
-+                                <texture background="true" fallback="views/fallbacks/DefaultAudio.png/square-small.png">$VAR[OSDThumbnail]</texture>
++                                <texture background="true" fallback="views/fallbacks/DefaultAudio.png/square-small.png">$VAR[OSDNowPlayingThumbnail]</texture>
                                  <bordertexture border="30">osd/fullscreen/cover-shadow.png</bordertexture>
                                  <bordersize>20</bordersize>
                                  <aspectratio>scale</aspectratio>
@@ -16,7 +16,7 @@ index c8b627f..b6a0d7d 100644
                                  <width>1320</width>
                                  <height>56</height>
 -                                <label>$INFO[MusicPlayer.PlaylistPosition,,. ]$INFO[MusicPlayer.Title]</label>
-+                                <label>$VAR[OSDTitle]</label>
++                                <label>$VAR[OSDNowPlayingTitle]</label>
                                  <label2>$INFO[MusicPlayer.Rating,★ ,.0]</label2>
                                  <disabledcolor>bbwhite</disabledcolor>
                                  <font>Font-Condensed-S50-B</font>
@@ -25,7 +25,7 @@ index c8b627f..b6a0d7d 100644
                                  <width>1460</width>
                                  <height>44</height>
 -                                <label>$INFO[MusicPlayer.Artist]$INFO[MusicPlayer.Album, • ,]$INFO[MusicPlayer.Year, • ,]</label>
-+                                <label>$VAR[OSDSubTitle]</label>
++                                <label>$VAR[OSDNowPlayingSubTitle]</label>
                                  <textcolor>aawhite</textcolor>
                                  <font>Font-Condensed-S36-B</font>
                                  <align>left</align>
@@ -34,12 +34,12 @@ index c8b627f..b6a0d7d 100644
                                  <width>1460</width>
                                  <height>44</height>
 -                                <label>$INFO[MusicPlayer.Genre]</label>
-+                                <label>$VAR[OSDGenre]</label>
++                                <label>$VAR[OSDNowPlayingGenre]</label>
                                  <textcolor>88FFFFFF</textcolor>
                                  <font>Font-Condensed-S36</font>
                                  <align>left</align>
 diff --git a/1080i/Includes_Info.xml b/1080i/Includes_Info.xml
-index 577b074..f0bcbff 100644
+index 577b074..bf2041c 100644
 --- a/1080i/Includes_Info.xml
 +++ b/1080i/Includes_Info.xml
 @@ -205,16 +205,36 @@
@@ -58,19 +58,19 @@ index 577b074..f0bcbff 100644
          <value condition="Player.HasAudio + Pvr.IsPlayingRadio">$INFO[MusicPlayer.ChannelName]</value>
      </variable>
  
-+    <variable name="OSDTitle">
++    <variable name="OSDNowPlayingTitle">
 +        <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Title))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Title)]</value>
 +        <value>$INFO[MusicPlayer.PlaylistPosition,,. ]$INFO[MusicPlayer.Title]</value>
 +    </variable>
-+    <variable name="OSDSubTitle">
++    <variable name="OSDNowPlayingSubTitle">
 +        <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Artist))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Artist)]$INFO[Window(10000).Property(plugin.audio.streaming-radio.Album), • ,]$INFO[Window(10000).Property(plugin.audio.streaming-radio.Year), • ,]</value>
 +        <value>$INFO[MusicPlayer.Artist]$INFO[MusicPlayer.Album, • ,]$INFO[MusicPlayer.Year, • ,]</value>
 +    </variable>
-+    <variable name="OSDThumbnail">
++    <variable name="OSDNowPlayingThumbnail">
 +        <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Thumb))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Thumb)]</value>
 +        <value>$INFO[Player.Art(thumb)]</value>
 +    </variable>
-+    <variable name="OSDGenre">
++    <variable name="OSDNowPlayingGenre">
 +        <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Genre))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Genre)]$INFO[Window(10000).Property(plugin.audio.streaming-radio.Station), • ,]</value>
 +        <value condition="!IsEmpty(Window(10000).Property(plugin.audio.streaming-radio.Station))">$INFO[Window(10000).Property(plugin.audio.streaming-radio.Station)]</value>
 +        <value>$INFO[MusicPlayer.Genre]</value>
