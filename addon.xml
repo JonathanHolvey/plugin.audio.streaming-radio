@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.4.1">
+<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.4.2">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.requests" version="2.9.1"/>
@@ -19,6 +19,9 @@
 		<email/>
 		<source/>
 		<news>
+			v1.4.2 (2017-01/09)
+			- Bugfix: Removed conflict which prevented live TV show title from being displayed in Xperience1080 OSD
+			
 			v1.4.1 (2017-01-26)
 			- Fixed compatibility with Python 2.6 for Android devices
 			
