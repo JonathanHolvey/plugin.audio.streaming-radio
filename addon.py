@@ -89,7 +89,8 @@ class RadioPlayer(xbmc.Player):
             info = RadioInfo(source)
             start_time = datetime.today()
             # Wait for playback to start, then loop until stopped
-            while self.isPlaying() or datetime.today() <= start_time + timedelta(seconds=5):
+            while (self.isPlayingAudio() and xbmc.Player().getPlayingFile() == source.stream_url
+                   or datetime.today() <= start_time + timedelta(seconds=5)):
                 info.update()
                 xbmc.sleep(1000)
 
