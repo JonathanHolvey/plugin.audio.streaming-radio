@@ -129,7 +129,7 @@ class RadioInfo():
             if not self.delayed:
                 self.next_update = datetime.today() + timedelta(seconds=10)
 
-    # Push track info to skin the as window properties
+    # Push track info to the skin as window properties
     def set_info(self):
         for name, value in self.info.items():
             name = addon.getAddonInfo("id") + "." + name
