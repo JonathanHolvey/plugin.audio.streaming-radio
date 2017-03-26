@@ -1,3 +1,4 @@
 sources/*.xml
 !sources/buddha.xml 
 **/*.pyo
+**/__pycache__

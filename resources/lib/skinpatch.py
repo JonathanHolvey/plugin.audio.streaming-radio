@@ -37,7 +37,7 @@ class SkinPatch():
             return False
         for patch_path in self.patches:
             patchset = patch.fromfile(patch_path)
-            if patchset.apply(root=self.skin_path):
+            if patchset.can_apply(root=self.skin_path) and patchset.apply(root=self.skin_path):
                 # Set patch status
                 self.status = STATUS_PATCHED
                 self.patch = os.path.basename(patch_path)

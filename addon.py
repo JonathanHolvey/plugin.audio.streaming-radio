@@ -47,7 +47,7 @@ class RadioSource():
                              "artist": self.info.get("tagline", None),
                              "genre": self.info.get("genre", None)
                              })
-        li.setArt(self.__build_art())
+        li.setArt(self._build_art())
         return li
 
     # Start playing the radio source
@@ -67,7 +67,7 @@ class RadioSource():
         RadioPlayer().play_stream(self)
 
     # Create dictionary of available artwork files to supply to list item
-    def __build_art(self):
+    def _build_art(self):
         art = {}
         for art_type in ("thumb", "fanart", "poster", "banner",
                          "clearart", "clearlogo", "landscape", "icon"):
@@ -89,7 +89,8 @@ class RadioPlayer(xbmc.Player):
             info = RadioInfo(source)
             start_time = datetime.today()
             # Wait for playback to start, then loop until stopped
-            while self.isPlaying() or datetime.today() <= start_time + timedelta(seconds=5):
+            while (self.isPlayingAudio() and xbmc.Player().getPlayingFile() == source.stream_url
+                   or datetime.today() <= start_time + timedelta(seconds=5)):
                 info.update()
                 xbmc.sleep(1000)
 
@@ -128,7 +129,7 @@ class RadioInfo():
             if not self.delayed:
                 self.next_update = datetime.today() + timedelta(seconds=10)
 
-    # Push track info to skin the as window properties
+    # Push track info to the skin as window properties
     def set_info(self):
         for name, value in self.info.items():
             name = addon.getAddonInfo("id") + "." + name
@@ -148,7 +149,7 @@ class RadioInfo():
     def get_now_playing(self):
         track_id = self.id_track()
         if self.scraper["type"] == "tunein":
-            self.__update_tunein()
+            self._update_tunein()
         # Return True if track info has changed
         return track_id != self.id_track()
 
@@ -172,7 +173,7 @@ class RadioInfo():
                     if "image" in track_info["album"] and len(track_info["album"]["image"]) > 0:
                         self.info["thumb"] = track_info["album"]["image"][-1]["#text"]
                 if "duration" in track_info:
-                    self.info["duration"] = track_info["duration"]
+                    self.duration = int(track_info["duration"])
                 if "toptags" in track_info and len(track_info["toptags"]["tag"]) > 0:
                     self.info["genre"] = track_info["toptags"]["tag"][0]["name"].capitalize()
         except requests.exceptions.ConnectionError:
@@ -182,7 +183,7 @@ class RadioInfo():
         return self.info.get("title", "") + self.info.get("artist", "")
 
     # Scrape track info from Tunein website
-    def __update_tunein(self):
+    def _update_tunein(self):
         try:
             html = requests.get(self.scraper["url"]).text
             match = re.search(r"<h3 class=\"title\">(.+?) - (.+?)</h3>", html)
