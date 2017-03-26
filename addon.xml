@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.5.0">
+<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.5.1">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.requests" version="2.9.1"/>
@@ -19,10 +19,13 @@
 		<email/>
 		<source/>
 		<news>
+			v1.5.1 (2017-03-26)
+			- Bugfix: Prevent skin patch lockout when addon and skin have both been updated
+
 			v1.5.0 (2017-03-26)
-			- Bugfix: Prevent skins ending up in a partially patched state. Broken skins should be fixed by reinstalling
-			- Improve skin patching so that line numbers don't need to match
-			- Redesign addon icon for cleaner (less confusing) look
+			- Bugfix: Prevented skins ending up in a partially patched state. Broken skins should be fixed by reinstalling
+			- Improveed skin patching so that line numbers don't need to match
+			- Redesigned addon icon for cleaner (less confusing) look
 
 			v1.4.2 (2017-01-09)
 			- Bugfix: Removed conflict which prevented live TV show title from being displayed in Xperience1080 OSD
