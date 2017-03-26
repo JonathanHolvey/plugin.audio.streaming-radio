@@ -34,6 +34,7 @@ import os
 import posixpath
 import shutil
 import sys
+import itertools
 
 
 PY3K = sys.version_info >= (3, 0)
@@ -215,6 +216,9 @@ class Hunk(object):
     self.invalid=False
     self.desc=''
     self.text=[]
+    self.offset = 0
+    self.contextstart = None
+    self.contextend = None
 
 #  def apply(self, estream):
 #    """ write hunk data into enumerable stream
@@ -600,6 +604,12 @@ class PatchSet(object):
     if debugmode and len(self.items) > 0:
         debug("- %2d hunks for %s" % (len(p.hunks), p.source))
 
+    # Count context lines at the beginning and end of each hunk
+    for p in self.items:
+      for hunk in p.hunks:
+        hunk.contextstart = [x[0:1] if x[0] in b" -" else b"-" for x in hunk.text].index(b"-")
+        hunk.contextend   = [x[0:1] if x[0] in b" -" else b"-" for x in reversed(hunk.text)].index(b"-")
+
     # XXX fix total hunks calculation
     debug("total files: %d  total hunks: %d" % (len(self.items),
         sum(len(p.hunks) for p in self.items)))
@@ -697,8 +707,8 @@ class PatchSet(object):
     for i,p in enumerate(self.items):
       if debugmode:
         debug("    patch type = " + p.type)
-        debug("    source = " + p.source)
-        debug("    target = " + p.target)
+        debug("    source = " + p.source.decode("utf-8"))
+        debug("    target = " + p.target.decode("utf-8"))
       if p.type in (HG, GIT):
         # TODO: figure out how to deal with /dev/null entries
         debug("stripping a/ and b/ prefixes")
@@ -810,7 +820,7 @@ class PatchSet(object):
     else:
       # [w] Google Code generates broken patches with its online editor
       debug("broken patch from Google Code, stripping prefixes..")
-      if old.startswith(b'a/') and new.startswith(b'b/'):
+      if old.startswith('a/') and new.startswith('b/'):
         old, new = old[2:], new[2:]
         debug("   %s" % old)
         debug("   %s" % new)
@@ -854,7 +864,7 @@ class PatchSet(object):
       else:
         old, new = p.source, p.target
 
-      filename = self.findfile(old, new)
+      filename = self.findfile(old.decode("utf-8"), new.decode("utf-8"))
 
       if not filename:
           warning("source/target file does not exist:\n  --- %s\n  +++ %s" % (old, new))
@@ -869,75 +879,16 @@ class PatchSet(object):
       debug("processing %d/%d:\t %s" % (i+1, total, filename))
 
       # validate before patching
-      f2fp = open(filename, 'rb')
-      hunkno = 0
-      hunk = p.hunks[hunkno]
-      hunkfind = []
-      hunkreplace = []
-      validhunks = 0
       canpatch = False
-      for lineno, line in enumerate(f2fp):
-        if lineno+1 < hunk.startsrc:
-          continue
-        elif lineno+1 == hunk.startsrc:
-          hunkfind = [x[1:].rstrip(b"\r\n") for x in hunk.text if x[0] in b" -"]
-          hunkreplace = [x[1:].rstrip(b"\r\n") for x in hunk.text if x[0] in b" +"]
-          #pprint(hunkreplace)
-          hunklineno = 0
-
-          # todo \ No newline at end of file
-
-        # check hunks in source file
-        if lineno+1 < hunk.startsrc+len(hunkfind)-1:
-          if line.rstrip(b"\r\n") == hunkfind[hunklineno]:
-            hunklineno+=1
-          else:
-            info("file %d/%d:\t %s" % (i+1, total, filename))
-            info(" hunk no.%d doesn't match source file at line %d" % (hunkno+1, lineno+1))
-            info("  expected: %s" % hunkfind[hunklineno])
-            info("  actual  : %s" % line.rstrip(b"\r\n"))
-            # not counting this as error, because file may already be patched.
-            # check if file is already patched is done after the number of
-            # invalid hunks if found
-            # TODO: check hunks against source/target file in one pass
-            #   API - check(stream, srchunks, tgthunks)
-            #           return tuple (srcerrs, tgterrs)
-
-            # continue to check other hunks for completeness
-            hunkno += 1
-            if hunkno < len(p.hunks):
-              hunk = p.hunks[hunkno]
-              continue
-            else:
-              break
-
-        # check if processed line is the last line
-        if lineno+1 == hunk.startsrc+len(hunkfind)-1:
-          debug(" hunk no.%d for file %s  -- is ready to be patched" % (hunkno+1, filename))
-          hunkno+=1
-          validhunks+=1
-          if hunkno < len(p.hunks):
-            hunk = p.hunks[hunkno]
-          else:
-            if validhunks == len(p.hunks):
-              # patch file
-              canpatch = True
-              break
+      hunks = self._match_file_hunks(filename, p.hunks)
+      if hunks is not False:
+        p.hunks = hunks
+        canpatch = True
       else:
-        if hunkno < len(p.hunks):
-          warning("premature end of source file %s at hunk %d" % (filename, hunkno+1))
-          errors += 1
+        errors += 1
 
-      f2fp.close()
-
-      if validhunks < len(p.hunks):
-        if self._match_file_hunks(filename, p.hunks):
-          warning("already patched  %s" % filename)
-        else:
-          warning("source file is different - %s" % filename)
-          errors += 1
       if canpatch:
-        backupname = filename+b".orig"
+        backupname = filename+".orig"
         if exists(backupname):
           warning("can't backup original file to %s - aborting" % backupname)
         else:
@@ -991,49 +942,93 @@ class PatchSet(object):
     """
     filename = abspath(filename)
     for p in self.items:
-      if filename == abspath(p.source):
-        return self._match_file_hunks(filename, p.hunks)
+      if filename == abspath(p.source.decode("utf-8")):
+        return self._match_file_hunks(filename, p.hunks) is not False
     return None
 
 
+  def can_apply(self, root=None):
+    """ Check if entire patch can be applied without error. Returns True on
+    success and False on failure.
+    """
+    if root:
+      prevdir = os.getcwd()
+      os.chdir(root)
+
+    result = True
+    for p in self.items:
+      if self._match_file_hunks(p.target, p.hunks) is False:
+        result = False
+    
+    if root:
+      os.chdir(prevdir)
+    
+    return result
+
+
   def _match_file_hunks(self, filepath, hunks):
-    matched = True
-    fp = open(abspath(filepath), 'rb')
+    f2fp = open(filepath, 'rb')
+    hunktext = []
+    hunkindex = []
+    matches = []
+    # Prepare hunk data for concurrent validation
+    for hunkno, hunk in enumerate(hunks):
+      hunktext += [x[1:].rstrip(b"\r\n") for x in hunk.text if x[0] in b" -"]
+      hunkindex += [(hunkno, hunkline) for hunkline in range(hunk.linessrc)]
 
-    class NoMatch(Exception):
-      pass
+    for lineno, line in enumerate(f2fp):
+      # Check all hunks concurrently, irrespective of line number and order
+      line = line.rstrip(b"\r\n")
+      if line in hunktext:
+        # Add all matching hunk start lines to matches list
+        matches += [{"hunk": hunkindex[i][0], "length": 0, "start": lineno,
+                     "offset": lineno - hunks[hunkindex[i][0]].startsrc + 1, "valid": None}
+                    for i, x in enumerate(hunktext) if line == x and hunkindex[i][1] == 0]
+        # Check each hunk match which hasn't already been validated
+        for match in (m for m in matches if m["valid"] is None):
+          hunkno = match["hunk"]
+          hunkline = match["length"]
+          if line == hunktext[hunkindex.index((hunkno, hunkline))]:
+            match["length"] += 1
+            if match["length"] == hunks[hunkno].linessrc:
+              match["valid"] = True
+              debug("hunk {} matched at line {} with offset {}".format(hunkno+1, match["start"]+1, match["offset"]))
+          else:
+            match["valid"] = False
+    f2fp.close()
 
-    lineno = 1
-    line = fp.readline()
-    hno = None
-    try:
-      for hno, h in enumerate(hunks):
-        # skip to first line of the hunk
-        while lineno < h.starttgt:
-          if not len(line): # eof
-            debug("check failed - premature eof before hunk: %d" % (hno+1))
-            raise NoMatch
-          line = fp.readline()
-          lineno += 1
-        for hline in h.text:
-          if hline.startswith(b"-"):
-            continue
-          if not len(line):
-            debug("check failed - premature eof on hunk: %d" % (hno+1))
-            # todo: \ No newline at the end of file
-            raise NoMatch
-          if line.rstrip(b"\r\n") != hline[1:].rstrip(b"\r\n"):
-            debug("file is not patched - failed hunk: %d" % (hno+1))
-            raise NoMatch
-          line = fp.readline()
-          lineno += 1
+    # Discard invalid hunk matches
+    matches = [m for m in matches if m["valid"] is True]
+    # Group matches by hunk number
+    hunkmatches = [list() for x in range(len(hunks))]
+    for match in matches:
+      hunkmatches[match["hunk"]].append(match)
+    validhunks = sum([1 for x in hunkmatches if len(x) > 0])
+    if validhunks < len(hunks):
+      failedhunks = [str(hunkno+1) for hunkno, x in enumerate(hunkmatches) if len(x) == 0]
+      debug("check failed - hunk{} {} not matched".format("s" if len(failedhunks) > 1 else "", ", ".join(failedhunks)))
+      return False
 
-    except NoMatch:
-      matched = False
-      # todo: display failed hunk, i.e. expected/found
-
-    fp.close()
-    return matched
+    # Check for conflicting hunk offsets which will modify the same line
+    hunkoffsets = [sorted([x["offset"] for x in y], key=abs) for y in hunkmatches]
+    for offsets in itertools.product(*hunkoffsets):
+      patchlines = []
+      for hunkno, hunk in enumerate(hunks):
+        hunklines = list(range(hunk.startsrc + hunk.contextstart + offsets[hunkno],
+                               hunk.startsrc + hunk.linessrc - hunk.contextend + offsets[hunkno]))
+        if len(set(patchlines).intersection(hunklines)) == 0:
+          patchlines += hunklines
+          # Stop searching if the last hunk is reached without conflicts
+          if hunkno + 1 == len(hunks):
+            for hunkno, offset in enumerate(offsets):
+              hunks[hunkno].offset = offset
+              if offset != 0:
+                info("hunk {} offset by {:+} lines".format(hunkno+1, offset))
+            return hunks  # Return hunk objects, including new offset values
+        else:
+          break
+    debug("file cannot be patched - hunks conflict")
+    return False
 
 
   def patch_stream(self, instream, hunks):
@@ -1047,7 +1042,7 @@ class PatchSet(object):
     #       at the start and at the end of patching. Also issue a
     #       warning/throw about mixed lineends (is it really needed?)
 
-    hunks = iter(hunks)
+    hunks = iter(sorted(hunks, key=lambda x: x.startsrc + x.offset + x.contextstart))
 
     srclineno = 1
 
@@ -1068,13 +1063,12 @@ class PatchSet(object):
       return line
 
     for hno, h in enumerate(hunks):
-      debug("hunk %d" % (hno+1))
       # skip to line just before hunk starts
-      while srclineno < h.startsrc:
+      while srclineno < h.startsrc + h.offset + h.contextstart:
         yield get_line()
         srclineno += 1
 
-      for hline in h.text:
+      for hline in h.text[h.contextstart:-h.contextend]:
         # todo: check \ No newline at the end of file
         if hline.startswith(b"-") or hline.startswith(b"\\"):
           get_line()
