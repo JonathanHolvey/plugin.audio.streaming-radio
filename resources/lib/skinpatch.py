@@ -72,7 +72,6 @@ class SkinPatch():
         if self.status == STATUS_CLEAN:
             if self.apply():
                 xbmc.executebuiltin("ReloadSkin()")
-                xbmc.sleep(1000)
             else:
                 return
         window.setProperty(property_name, self.version)
@@ -140,7 +139,6 @@ def autoremove():
         for skin in xml.findall("skin"):
             SkinPatch(skin.attrib["id"]).revert()
         xbmc.executebuiltin("ReloadSkin()")
-        xbmc.sleep(1000)
 
 
 def hash_file(path):
