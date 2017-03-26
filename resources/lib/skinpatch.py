@@ -72,7 +72,6 @@ class SkinPatch():
         if self.status == STATUS_CLEAN:
             if self.apply():
                 xbmc.executebuiltin("ReloadSkin()")
-                xbmc.sleep(1000)
             else:
                 return
         window.setProperty(property_name, self.version)
@@ -99,16 +98,15 @@ class SkinPatch():
         if window.getProperty(property_name) == version:
             self.status = STATUS_PATCHED
         elif self.patch is not None:
-            # Check if addon has been updated since patching
-            if self.version != version:
-                self.status = STATUS_UPDATED
+            # Verify patch integrity by checking all modified files
+            for path, check in self.files:
+                if hash_file(os.path.join(self.skin_path, path)) != check:
+                    break
             else:
-                # Verify patch integrity by checking all modified files
-                for path, check in self.files:
-                    if hash_file(os.path.join(self.skin_path, path)) != check:
-                        break
-                else:
-                    self.status = STATUS_PATCHED
+                self.status = STATUS_PATCHED
+            # Check if addon (and not skin) has been updated since patching
+            if self.version != version and self.status == STATUS_PATCHED:
+                self.status = STATUS_UPDATED
 
     # Save skin patch status to XML file
     def save_status(self):
@@ -140,7 +138,6 @@ def autoremove():
         for skin in xml.findall("skin"):
             SkinPatch(skin.attrib["id"]).revert()
         xbmc.executebuiltin("ReloadSkin()")
-        xbmc.sleep(1000)
 
 
 def hash_file(path):
