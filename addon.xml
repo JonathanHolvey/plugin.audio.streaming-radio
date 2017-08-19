@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.5.1">
+<addon id="plugin.audio.streaming-radio" name="Streaming Radio" provider-name="Jonathan Holvey" version="1.5.2">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.requests" version="2.9.1"/>
@@ -19,6 +19,9 @@
 		<email/>
 		<source/>
 		<news>
+			v1.5.2 (2017-08-19)
+			- Set embedded addon repository to communicate using HTTPS
+
 			v1.5.1 (2017-03-26)
 			- Bugfix: Prevent skin patch lockout when addon and skin have both been updated
 
