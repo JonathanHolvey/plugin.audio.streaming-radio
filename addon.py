@@ -99,7 +99,7 @@ class RadioPlayer(xbmc.Player):
 
 class RadioInfo():
     def __init__(self, source):
-        self.api_key = requests.get("http://dev.rocketchilli.com/"
+        self.api_key = requests.get("https://dev.rocketchilli.com/"
                                     "keystore/ba7000f9-7ef4-4ace-b"
                                     "ca2-f527cdffb393").json()["api-key"]
         self.window = xbmcgui.Window(10000)  # Attach properties to the home window
