@@ -69,7 +69,7 @@ Stations can also be sorted by name only (ignoring `sort`) and by genre, using t
 1. ~~Pull track artwork from the web and display it in the skin~~ *Done*
 2. Increase the time between requests to tunein.com by looking up the track's duration and predicting when it will end
 3. Implement a more elegent track info scraper (using, for example Lightstreamer) for radio stations which support it
-4. ~~Apply a delay to the track info change to sync it with the audio (Tunein updates ~20 seconds before the track changes)~~ *Done*
+4. ~~Apply a delay to the track info change to sync it with the audio (Tunein updates \~20 seconds before the track changes)~~ *Done*
 5. ~~Show more track information in the OSD~~ *Done*
 6. ~~Automatically apply skin patch on first run~~ *Done*
 7. Add support for other skins - pull requests welcome
