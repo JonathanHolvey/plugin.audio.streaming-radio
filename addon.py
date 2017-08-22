@@ -99,7 +99,7 @@ class RadioPlayer(xbmc.Player):
 
 class RadioInfo():
     def __init__(self, source):
-        self.api_key = requests.get("http://dev.rocketchilli.com/"
+        self.api_key = requests.get("https://dev.rocketchilli.com/"
                                     "keystore/ba7000f9-7ef4-4ace-b"
                                     "ca2-f527cdffb393").json()["api-key"]
         self.window = xbmcgui.Window(10000)  # Attach properties to the home window
@@ -186,7 +186,7 @@ class RadioInfo():
     def _update_tunein(self):
         try:
             html = requests.get(self.scraper["url"]).text
-            match = re.search(r"<h3 class=\"title\">(.+?) - (.+?)</h3>", html)
+            match = re.search(r"<p class=\"default__titleOffset.+?>(.+?) - (.+?)</p>", html)
             if match is not None:
                 self.info["artist"] = unescape(match.group(1))
                 self.info["title"] = unescape(match.group(2))
