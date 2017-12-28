@@ -1,4 +1,6 @@
 sources/*.xml
-!sources/buddha.xml 
+!sources/buddha.xml
+artwork/*
+!artwork/buddha*
 **/*.pyo
 **/__pycache__
