@@ -77,6 +77,6 @@ Stations can also be sorted by name only (ignoring `sort`) and by genre, using t
 
 ## Licence
 
-This software is distributed under the GNU General Public License v3. Copyright 2016 Jonathan Holvey.
+This software is distributed under the GNU General Public License v3. Copyright 2016-2018 Jonathan Holvey.
 
 [screenshot]: http://i.imgur.com/ITegNCy.png
