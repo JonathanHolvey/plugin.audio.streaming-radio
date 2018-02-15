@@ -186,7 +186,7 @@ class RadioInfo():
     def _update_tunein(self):
         try:
             html = requests.get(self.scraper["url"]).text
-            match = re.search(r"<p class=\"default__titleOffset.+?>(.+?) - (.+?)</p>", html)
+            match = re.search(r"<p class=\".*?guide-item__guideItemSubtitle.*?>(.+?) - (.+?)</p>", html)
             if match is not None:
                 self.info["artist"] = unescape(match.group(1))
                 self.info["title"] = unescape(match.group(2))
