@@ -4,7 +4,6 @@ import urlparse
 import sys
 import requests
 import re
-import HTMLParser
 from datetime import datetime, timedelta
 
 import xbmc
@@ -12,6 +11,7 @@ import xbmcgui
 import xbmcaddon
 import xbmcplugin
 from resources.lib import skinpatch
+from resources.lib import utils
 
 plugin_url = sys.argv[0]
 handle = int(sys.argv[1])
@@ -164,8 +164,8 @@ class RadioInfo():
         track_url = ("http://ws.audioscrobbler.com/2.0/?method=track.getInfo"
                      "&api_key={0}&artist={1}&track={2}&format=json")
         try:
-            response = requests.get(track_url.format(self.api_key, urlencode(self.info["artist"]),
-                                                     urlencode(self.info["title"])))
+            response = requests.get(track_url.format(self.api_key, utils.urlencode(self.info["artist"]),
+                                                     utils.urlencode(self.info["title"])))
             if response.status_code == requests.codes.ok and "track" in response.json():
                 track_info = response.json()["track"]
                 if "album" in track_info:
@@ -188,8 +188,8 @@ class RadioInfo():
             html = requests.get(self.scraper["url"]).text
             match = re.search(r"<p class=\".*?guide-item__guideItemSubtitle.*?>(.+?) - (.+?)</p>", html)
             if match is not None:
-                self.info["artist"] = unescape(match.group(1))
-                self.info["title"] = unescape(match.group(2))
+                self.info["artist"] = utils.unescape(match.group(1))
+                self.info["title"] = utils.unescape(match.group(2))
         except requests.exceptions.ConnectionError:
             pass
 
@@ -210,15 +210,6 @@ def build_list():
     xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_TITLE)
     xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_GENRE)
     xbmcplugin.endOfDirectory(handle)
-
-
-def unescape(string):
-    html_parser = HTMLParser.HTMLParser()
-    return html_parser.unescape(string)
-
-
-def urlencode(string):
-    return requests.utils.quote(string.encode("utf8"))
 
 
 # Request permission from user to modify skin files
