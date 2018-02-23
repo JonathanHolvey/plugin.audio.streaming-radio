@@ -164,7 +164,8 @@ class RadioInfo():
         track_url = ("http://ws.audioscrobbler.com/2.0/?method=track.getInfo"
                      "&api_key={0}&artist={1}&track={2}&format=json")
         try:
-            response = requests.get(track_url.format(self.api_key, utils.urlencode(self.info["artist"]),
+            response = requests.get(track_url.format(self.api_key,
+                                                     utils.urlencode(self.info["artist"]),
                                                      utils.urlencode(self.info["title"])))
             if response.status_code == requests.codes.ok and "track" in response.json():
                 track_info = response.json()["track"]
@@ -186,7 +187,8 @@ class RadioInfo():
     def _update_tunein(self):
         try:
             html = requests.get(self.scraper["url"]).text
-            match = re.search(r"<p class=\".*?guide-item__guideItemSubtitle.*?>(.+?) - (.+?)</p>", html)
+            match = re.search(r"<p class=\".*?guide-item__guideItemSubtitle.*?>(.+?) - (.+?)</p>",
+                              html)
             if match is not None:
                 self.info["artist"] = utils.unescape(match.group(1))
                 self.info["title"] = utils.unescape(match.group(2))
