@@ -7,7 +7,9 @@ This addon allows you to specify custom internet radio streams and add artwork t
 
 ## Adding streams
 
-Radio streams can be added to the addon by specifying them in XML files in the `sources` folder, which can be found in the root of the addon. An example radio station `buddha.xml` is included, which can be used as a starting point:
+Radio streams can be added to the addon by specifying them in XML files in the `sources` folder inside `addon_data/plugin.audio.streaming-radio`. This can be found in the [Kodi user data folder](http://kodi.wiki/view/Userdata).
+
+An example radio station `buddha.xml` is included with the addon, which can be used as a starting point:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
