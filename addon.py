@@ -17,7 +17,9 @@ plugin_url = sys.argv[0]
 handle = int(sys.argv[1])
 addon = xbmcaddon.Addon()
 
-sources_path = os.path.join(addon.getAddonInfo("path"), "sources")
+data_path = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo("profile"))
+sources_path = os.path.join(data_path, "sources")
+artwork_path = os.path.join(data_path, "artwork")
 
 
 class RadioSource():
@@ -72,7 +74,7 @@ class RadioSource():
         for art_type in ("thumb", "fanart", "poster", "banner",
                          "clearart", "clearlogo", "landscape", "icon"):
             if self.info.get(art_type, None) is not None:
-                path = os.path.join(addon.getAddonInfo("path"), "artwork", self.info[art_type])
+                path = os.path.join(artwork_path, self.info[art_type])
                 if os.path.isfile(path):
                     art[art_type] = path
         return art
