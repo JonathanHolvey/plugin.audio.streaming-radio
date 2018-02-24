@@ -229,6 +229,12 @@ def prompt_skinpatch():
         skinpatch.SkinPatch().autopatch()
 
 
+# Setup before plugin is run
+if not os.path.exists(sources_path):
+    os.makedirs(sources_path)
+if not os.path.exists(artwork_path):
+    os.makedirs(artwork_path)
+
 # Extract URL parameters
 params = dict((key, value_list[0]) for key, value_list
               in urlparse.parse_qs(sys.argv[2][1:]).items())
