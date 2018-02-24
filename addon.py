@@ -5,6 +5,7 @@ import sys
 import requests
 import re
 from datetime import datetime, timedelta
+import shutil
 
 import xbmc
 import xbmcgui
@@ -17,7 +18,8 @@ plugin_url = sys.argv[0]
 handle = int(sys.argv[1])
 addon = xbmcaddon.Addon()
 
-data_path = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo("profile"))
+addon_path = addon.getAddonInfo("path")
+data_path = xbmc.translatePath(addon.getAddonInfo("profile"))
 sources_path = os.path.join(data_path, "sources")
 artwork_path = os.path.join(data_path, "artwork")
 
@@ -234,6 +236,16 @@ if not os.path.exists(sources_path):
     os.makedirs(sources_path)
 if not os.path.exists(artwork_path):
     os.makedirs(artwork_path)
+
+# Copy included source files to data directory on first run
+if addon.getSetting("first-run-complete") == "false":
+    for file in os.listdir(os.path.join(addon_path, "resources", "sources")):
+        if os.path.isfile(os.path.join(sources_path, file)):
+            shutil.copy(os.path.join(addon_path, "resources", "sources", file), sources_path)
+    for file in os.listdir(os.path.join(addon_path, "resources", "artwork")):
+        if os.path.isfile(os.path.join(artwork_path, file)):
+            shutil.copy(os.path.join(addon_path, "resources", "artwork", file), artwork_path)
+    addon.setSetting("first-run-complete", "true")
 
 # Extract URL parameters
 params = dict((key, value_list[0]) for key, value_list
