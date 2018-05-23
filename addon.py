@@ -3,9 +3,9 @@ import xml.etree.ElementTree as et
 import urlparse
 import sys
 import requests
-import re
 import HTMLParser
 from datetime import datetime, timedelta
+from bs4 import BeautifulSoup
 
 import xbmc
 import xbmcgui
@@ -185,11 +185,11 @@ class RadioInfo():
     # Scrape track info from Tunein website
     def _update_tunein(self):
         try:
-            html = requests.get(self.scraper["url"]).text
-            match = re.search(r"<p class=\".*?guide-item__guideItemSubtitle.*?>(.+?) - (.+?)</p>", html)
-            if match is not None:
-                self.info["artist"] = unescape(match.group(1))
-                self.info["title"] = unescape(match.group(2))
+            html = BeautifulSoup(requests.get(self.scraper["url"]).text, "html.parser")
+            match = html.select("p.guide-item__guideItemSubtitle___2hQxF")
+
+            if len(match) > 0 and " - " in match[0].string:
+                self.info["artist"], self.info["title"] = match[0].string.split(" - ")
         except requests.exceptions.ConnectionError:
             pass
 
